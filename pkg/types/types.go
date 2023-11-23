@@ -10,7 +10,6 @@ type DateAndTime struct {
 }
 
 type WaterLevelOnTime struct {
-	DateAndTime
 	WaterLevel uint16
 }
 
@@ -19,7 +18,7 @@ type DeltaWaterLevel struct {
 }
 
 type WaterLevelOn20h struct {
-	WaterLevel uint16
+	WaterLevel20h uint16
 }
 
 type Temperature struct {
@@ -44,6 +43,7 @@ type Reservoir struct {
 type FullTelegram struct {
 	PostCode
 	IsDangerous bool
+	DateAndTime
 	WaterLevelOnTime
 	DeltaWaterLevel
 	WaterLevelOn20h

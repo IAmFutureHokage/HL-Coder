@@ -47,6 +47,58 @@ func DateAndTimeDecode(s string) (*types.DateAndTime, error) {
 	}, nil
 }
 
+func WaterLevelOnTime(s string) (*types.WaterLevelOnTime, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[0] != '1' {
+		return nil, fmt.Errorf("first character must be '1'")
+	}
+
+	waterlevel, err := strconv.Atoi(s[1:])
+	if err != nil {
+		return nil, fmt.Errorf("invalid waterlavel value")
+	}
+
+	return &types.WaterLevelOnTime{
+		WaterLevel: uint16(waterlevel),
+	}, nil
+}
+
+func DeltaWaterLevel(s string) (*types.DeltaWaterLevel, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[0] != '2' {
+		return nil, fmt.Errorf("first character must be '2'")
+	}
+
+	if s[4] != '1' && s[4] != '2' {
+		return nil, fmt.Errorf("fifth character must be '1' or '2'")
+	}
+
+	delta, err := strconv.Atoi(s[1:4])
+	if err != nil {
+		return nil, fmt.Errorf("invalid waterlavel value")
+	}
+
+	if s[4] == '1' {
+		delta = 0 + delta
+	} else {
+		delta = 0 - delta
+	}
+
+	return &types.DeltaWaterLevel{
+		Delta: int16(delta),
+	}, nil
+}
+
 func checkCodeBlock(s string) error {
 
 	matched, err := regexp.MatchString(`^\d{5}$`, s)
