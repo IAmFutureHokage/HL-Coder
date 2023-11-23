@@ -24,6 +24,11 @@ type Phenomenia struct {
 	Intensity   *byte
 }
 
+type Precipitation struct {
+	Value    float32
+	Duration PrecipitationDuration
+}
+
 type IsReservoir struct {
 	State bool
 	Date  byte
@@ -45,9 +50,3 @@ type IsReservoirWaterInflow struct {
 type ObPs uint32
 
 type Reset uint32
-
-type Precipitation struct {
-	Value    float32
-	Duration PrecipitationInterval
-	//00124 0 1 - группа, 2-4 -значение, 5 - enam завтра скинешь
-}

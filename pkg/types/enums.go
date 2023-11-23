@@ -16,20 +16,20 @@ func (ct *IcePhenomeniaState) FromByte(b byte) {
 	*ct = IcePhenomeniaState(b)
 }
 
-type PrecipitationInterval byte
+type PrecipitationDuration byte
 
 const (
-	Less1 PrecipitationInterval = iota
+	Less1 PrecipitationDuration = iota
 	From1To3
 	From3To6
 	From6To12
 	More12
 )
 
-func (ct PrecipitationInterval) ToByte() byte {
+func (ct PrecipitationDuration) ToByte() byte {
 	return byte(ct)
 }
 
-func (ct *PrecipitationInterval) FromByte(b byte) {
-	*ct = PrecipitationInterval(b)
+func (ct *PrecipitationDuration) FromByte(b byte) {
+	*ct = PrecipitationDuration(b)
 }

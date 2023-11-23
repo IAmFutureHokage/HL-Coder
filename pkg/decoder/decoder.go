@@ -223,9 +223,81 @@ func IcePhenomeniaStateDecoder(s string) (*types.IcePhenomeniaState, error) {
 	if s != "60000" {
 		return nil, fmt.Errorf("Ivalid 6 group")
 	}
-	response := types.IcePhenomeniaState(2)
 
+	response := types.IcePhenomeniaState(2)
 	return &response, nil
+}
+
+func PrecipitationDecoder(s string) (*types.Precipitation, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[0] != '0' {
+		return nil, fmt.Errorf("first character must be '0'")
+	}
+
+	value, err := strconv.ParseFloat(s[1:4], 32)
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid precipitation value")
+	}
+
+	duration, err := strconv.Atoi(s[4:])
+	if err != nil || duration < 0 || duration > 4 {
+		return nil, fmt.Errorf("Ivalid duration value")
+	}
+
+	if value >= 990 {
+		value = (value - 990) / 10
+	}
+
+	return &types.Precipitation{
+		Value:    float32(value),
+		Duration: types.PrecipitationDuration(duration),
+	}, nil
+}
+
+func IsReservoirDecoder(s string) (*types.IsReservoir, error) {
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[:3] != "944" {
+		return nil, fmt.Errorf("Ivalid reservoir data")
+	}
+
+	date, err := strconv.Atoi(s[3:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid date value")
+	}
+
+	return &types.IsReservoir{
+		State: true,
+		Date:  byte(date),
+	}, nil
+}
+
+func HeadwaterLevelDecoder(s string) (*types.HeadwaterLevel, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[0] != '1' {
+		return nil, fmt.Errorf("first character must be '1'")
+	}
+	headwaterlevel, err := strconv.Atoi(s[1:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid headwater level value")
+	}
+
+	response := types.HeadwaterLevel(headwaterlevel)
+	return &response, nil
+
 }
 
 func checkCodeBlock(s string) error {
