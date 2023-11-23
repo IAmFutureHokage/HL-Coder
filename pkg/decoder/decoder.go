@@ -329,12 +329,89 @@ func DownstreamLevelDecoder(s string) (*types.DownstreamLevel, error) {
 	if s[:2] != "40" {
 		return nil, fmt.Errorf("first characters must be '40'")
 	}
+
 	waterlevel, err := strconv.Atoi(s[2:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid downstream level value")
 	}
 
 	response := types.DownstreamLevel(waterlevel)
+	return &response, nil
+}
+
+func ReservoirVolumeDecoder(s string) (*types.ReservoirVolume, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[:2] != "75" {
+		return nil, fmt.Errorf("first characters must be '75'")
+	}
+
+	volume, err := strconv.Atoi(s[2:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid volume value")
+	}
+	response := types.ReservoirVolume(volume * 100)
+	return &response, nil
+}
+
+func IsReservoirWaterInflowDecoder(s string) (*types.IsReservoirWaterInflow, error) {
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[:3] != "955" {
+		return nil, fmt.Errorf("Ivalid ReservoirWaterInflow data")
+	}
+
+	date, err := strconv.Atoi(s[3:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid date value")
+	}
+
+	return &types.IsReservoirWaterInflow{
+		IsReservoirWaterInflow: true,
+		Date:                   byte(date),
+	}, nil
+}
+
+func ObPsDecoder(s string) (*types.ObPs, error) {
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[:2] != "43" {
+		return nil, fmt.Errorf("first characters must be '43'")
+	}
+
+	obps, err := strconv.Atoi(s[2:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid obps value")
+	}
+	response := types.ObPs(obps)
+	return &response, nil
+}
+
+func ResetDecoder(s string) (*types.Reset, error) {
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[:2] != "73" {
+		return nil, fmt.Errorf("first characters must be '73'")
+	}
+
+	reset, err := strconv.Atoi(s[2:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid reset value")
+	}
+	response := types.Reset(reset)
 	return &response, nil
 }
 

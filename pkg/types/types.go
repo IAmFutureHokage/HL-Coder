@@ -2,6 +2,8 @@ package types
 
 type PostCode string
 
+type IsDangerous bool
+
 type DateAndTime struct {
 	Date byte
 	Time byte
