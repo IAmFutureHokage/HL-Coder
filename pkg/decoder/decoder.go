@@ -297,7 +297,45 @@ func HeadwaterLevelDecoder(s string) (*types.HeadwaterLevel, error) {
 
 	response := types.HeadwaterLevel(headwaterlevel)
 	return &response, nil
+}
 
+func AverageReservoirLevelDecoder(s string) (*types.AverageReservoirLevel, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[0] != '2' {
+		return nil, fmt.Errorf("first character must be '2'")
+	}
+
+	waterlevel, err := strconv.Atoi(s[1:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid avarage waterlevel value")
+	}
+
+	response := types.AverageReservoirLevel(waterlevel)
+	return &response, nil
+}
+
+func DownstreamLevelDecoder(s string) (*types.DownstreamLevel, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[:2] != "40" {
+		return nil, fmt.Errorf("first characters must be '40'")
+	}
+	waterlevel, err := strconv.Atoi(s[2:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid downstream level value")
+	}
+
+	response := types.DownstreamLevel(waterlevel)
+	return &response, nil
 }
 
 func checkCodeBlock(s string) error {

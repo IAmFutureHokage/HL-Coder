@@ -7,9 +7,6 @@ type Reservoir struct {
 	ReservoirVolume       ReservoirVolume
 	IsReservoirWaterInflow
 	ReservoirWaterInflow ReservoirWaterInflow
-	//1. Уровень верхнего бьефа 19543 (1 - группа, 2-5 значение)
-	//2. Уровень среднего водохранилища 29555 ( 1 - группа, 2-5 значение)
-	//3. Уровень нижнего бьефа 40308 ( 1-2 группа, 3-5 уровень)
 	//4. Обем водохранилища 75671 (1-2 группа, 3-5 значение * 100)
 	//5  955(дата)
 }
