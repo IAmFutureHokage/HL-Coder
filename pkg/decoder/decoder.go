@@ -15,9 +15,8 @@ func PostCodeDecode(s string) (*types.PostCode, error) {
 		return nil, err
 	}
 
-	return &types.PostCode{
-		PostCode: s,
-	}, nil
+	response := types.PostCode(s)
+	return &response, nil
 }
 
 func DateAndTimeDecode(s string) (*types.DateAndTime, error) {
@@ -67,9 +66,8 @@ func WaterLevelOnTime(s string) (*types.WaterLevelOnTime, error) {
 		return nil, fmt.Errorf("invalid waterlavel value")
 	}
 
-	return &types.WaterLevelOnTime{
-		WaterLevel: uint16(waterlevel),
-	}, nil
+	response := types.WaterLevelOnTime(waterlevel)
+	return &response, nil
 }
 
 func DeltaWaterLevel(s string) (*types.DeltaWaterLevel, error) {
@@ -102,9 +100,8 @@ func DeltaWaterLevel(s string) (*types.DeltaWaterLevel, error) {
 		delta = 0 - delta
 	}
 
-	return &types.DeltaWaterLevel{
-		Delta: int16(delta),
-	}, nil
+	response := types.DeltaWaterLevel(delta)
+	return &response, nil
 }
 
 func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
@@ -127,9 +124,8 @@ func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
 		return nil, fmt.Errorf("invalid waterlavel value")
 	}
 
-	return &types.WaterLevelOn20h{
-		WaterLevel20h: uint16(waterlevel),
-	}, nil
+	response := types.WaterLevelOn20h(waterlevel)
+	return &response, nil
 }
 
 func Temperature(s string) (*types.Temperature, error) {
