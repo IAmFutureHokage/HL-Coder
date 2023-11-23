@@ -19,6 +19,20 @@ func PostCodeDecodeDecoder(s string) (*types.PostCode, error) {
 	return &response, nil
 }
 
+func IsDangerousDecoder(s string) (*types.IsDangerous, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+	if s != "97701" {
+		return nil, fmt.Errorf("invalid 977 data")
+	}
+
+	response := types.IsDangerous(true)
+	return &response, nil
+}
+
 func DateAndTimeDecodeDer(s string) (*types.DateAndTime, error) {
 
 	err := checkCodeBlock(s)
@@ -270,8 +284,8 @@ func IsReservoirDecoder(s string) (*types.IsReservoir, error) {
 	}
 
 	date, err := strconv.Atoi(s[3:])
-	if err != nil {
-		return nil, fmt.Errorf("Ivalid date value")
+	if err != nil || date > 31 {
+		return nil, fmt.Errorf("invalid day value")
 	}
 
 	return &types.IsReservoir{
@@ -369,8 +383,8 @@ func IsReservoirWaterInflowDecoder(s string) (*types.IsReservoirWaterInflow, err
 	}
 
 	date, err := strconv.Atoi(s[3:])
-	if err != nil {
-		return nil, fmt.Errorf("Ivalid date value")
+	if err != nil || date > 31 {
+		return nil, fmt.Errorf("invalid day value")
 	}
 
 	return &types.IsReservoirWaterInflow{
@@ -413,6 +427,26 @@ func ResetDecoder(s string) (*types.Reset, error) {
 	}
 	response := types.Reset(reset)
 	return &response, nil
+}
+
+func NextDayDecoder(s string) (*types.NextDay, error) {
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+	if s[:3] != "922" {
+		return nil, fmt.Errorf("Invalid 922 data")
+	}
+
+	day, err := strconv.Atoi(s[3:])
+	if err != nil || day > 31 {
+		return nil, fmt.Errorf("invalid day value")
+	}
+
+	return &types.NextDay{
+		IsNextDay: true,
+		Date:      byte(day),
+	}, nil
 }
 
 func checkCodeBlock(s string) error {

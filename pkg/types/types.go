@@ -52,3 +52,8 @@ type IsReservoirWaterInflow struct {
 type ObPs uint32
 
 type Reset uint32
+
+type NextDay struct {
+	IsNextDay bool
+	Date      byte
+}
