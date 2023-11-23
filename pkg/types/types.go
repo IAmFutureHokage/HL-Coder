@@ -20,8 +20,8 @@ type Temperature struct {
 
 type Phenomenia struct {
 	Phenomen    byte
-	isUntensity bool
-	Intensity   byte
+	IsUntensity bool
+	Intensity   *byte
 }
 
 type IsReservoir struct {
@@ -50,8 +50,4 @@ type Precipitation struct {
 	Value    float32
 	Duration PrecipitationInterval
 	//00124 0 1 - группа, 2-4 -значение, 5 - enam завтра скинешь
-}
-
-type FullTelegram struct {
-	Telegram []Telegram
 }

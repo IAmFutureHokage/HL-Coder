@@ -8,7 +8,7 @@ import (
 	types "github.com/IAmFutureHokage/HL-Coder/pkg/types"
 )
 
-func PostCodeDecode(s string) (*types.PostCode, error) {
+func PostCodeDecodeDecoder(s string) (*types.PostCode, error) {
 
 	err := checkCodeBlock(s)
 	if err != nil {
@@ -19,7 +19,7 @@ func PostCodeDecode(s string) (*types.PostCode, error) {
 	return &response, nil
 }
 
-func DateAndTimeDecode(s string) (*types.DateAndTime, error) {
+func DateAndTimeDecodeDer(s string) (*types.DateAndTime, error) {
 
 	err := checkCodeBlock(s)
 	if err != nil {
@@ -46,7 +46,7 @@ func DateAndTimeDecode(s string) (*types.DateAndTime, error) {
 	}, nil
 }
 
-func WaterLevelOnTime(s string) (*types.WaterLevelOnTime, error) {
+func WaterLevelOnTimeDecoder(s string) (*types.WaterLevelOnTime, error) {
 
 	err := checkCodeBlock(s)
 	if err != nil {
@@ -70,7 +70,7 @@ func WaterLevelOnTime(s string) (*types.WaterLevelOnTime, error) {
 	return &response, nil
 }
 
-func DeltaWaterLevel(s string) (*types.DeltaWaterLevel, error) {
+func DeltaWaterLevelDecoder(s string) (*types.DeltaWaterLevel, error) {
 
 	err := checkCodeBlock(s)
 	if err != nil {
@@ -128,7 +128,7 @@ func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
 	return &response, nil
 }
 
-func Temperature(s string) (*types.Temperature, error) {
+func TemperatureDecoder(s string) (*types.Temperature, error) {
 
 	err := checkCodeBlock(s)
 	if err != nil {
@@ -161,6 +161,71 @@ func Temperature(s string) (*types.Temperature, error) {
 		WaterTemperature: float32(waterTemp) / 10.0,
 		AirTemperature:   int8(AirTemp),
 	}, nil
+}
+
+func PhenomeniaDecoder(s string) ([]*types.Phenomenia, error) {
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[0] != '5' {
+		return nil, fmt.Errorf("first character must be '5'")
+	}
+
+	firstPhenomenia, err := strconv.Atoi(s[1:3])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid phenomenia value")
+	}
+
+	secondPhenomenia, err := strconv.Atoi(s[3:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid phenomenia value")
+	}
+
+	if firstPhenomenia == secondPhenomenia {
+		return []*types.Phenomenia{
+			{
+				Phenomen:    byte(firstPhenomenia),
+				IsUntensity: false,
+				Intensity:   nil,
+			},
+		}, nil
+	}
+
+	if secondPhenomenia < 11 {
+		secondPhenomeniaByte := byte(secondPhenomenia)
+		return []*types.Phenomenia{
+			{
+				Phenomen:    byte(firstPhenomenia),
+				IsUntensity: true,
+				Intensity:   &secondPhenomeniaByte,
+			},
+		}, nil
+	}
+
+	return []*types.Phenomenia{
+		{
+			Phenomen:    byte(firstPhenomenia),
+			IsUntensity: false,
+			Intensity:   nil,
+		},
+		{
+			Phenomen:    byte(secondPhenomenia),
+			IsUntensity: false,
+			Intensity:   nil,
+		},
+	}, nil
+}
+
+func IcePhenomeniaStateDecoder(s string) (*types.IcePhenomeniaState, error) {
+
+	if s != "60000" {
+		return nil, fmt.Errorf("Ivalid 6 group")
+	}
+	response := types.IcePhenomeniaState(2)
+
+	return &response, nil
 }
 
 func checkCodeBlock(s string) error {
