@@ -1,6 +1,8 @@
 package types
 
-type PostCode uint32
+type PostCode struct {
+	PostCode string
+}
 
 type DateAndTime struct {
 	Date byte
