@@ -10,8 +10,8 @@ type Reservoir struct {
 }
 
 type ReservoirWaterInflow struct {
-	ObPs  ObPs
-	Reset Reset
+	Inflow Inflow
+	Reset  Reset
 }
 
 type Telegram struct {

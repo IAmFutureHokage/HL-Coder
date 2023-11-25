@@ -9,7 +9,7 @@ type DateAndTime struct {
 	Time byte
 }
 
-type WaterLevelOnTime uint16
+type WaterLevelOnTime int16
 
 type DeltaWaterLevel int16
 
@@ -49,11 +49,11 @@ type IsReservoirWaterInflow struct {
 	Date                   byte
 }
 
-type ObPs uint32
+type Inflow uint32
 
 type Reset uint32
 
-type NextDay struct {
+type PrevDay struct {
 	IsNextDay bool
 	Date      byte
 }

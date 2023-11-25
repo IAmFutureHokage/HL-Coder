@@ -19,7 +19,8 @@ func (ct *IcePhenomeniaState) FromByte(b byte) {
 type PrecipitationDuration byte
 
 const (
-	Less1 PrecipitationDuration = iota
+	No PrecipitationDuration = iota
+	Less1
 	From1To3
 	From3To6
 	From6To12

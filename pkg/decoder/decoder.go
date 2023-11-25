@@ -19,20 +19,6 @@ func PostCodeDecodeDecoder(s string) (*types.PostCode, error) {
 	return &response, nil
 }
 
-func IsDangerousDecoder(s string) (*types.IsDangerous, error) {
-
-	err := checkCodeBlock(s)
-	if err != nil {
-		return nil, err
-	}
-	if s != "97701" {
-		return nil, fmt.Errorf("invalid 977 data")
-	}
-
-	response := types.IsDangerous(true)
-	return &response, nil
-}
-
 func DateAndTimeDecodeDer(s string) (*types.DateAndTime, error) {
 
 	err := checkCodeBlock(s)
@@ -60,6 +46,20 @@ func DateAndTimeDecodeDer(s string) (*types.DateAndTime, error) {
 	}, nil
 }
 
+func IsDangerousDecoder(s string) (*types.IsDangerous, error) {
+
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+	if s != "97701" {
+		return nil, fmt.Errorf("invalid 977 data")
+	}
+
+	response := types.IsDangerous(true)
+	return &response, nil
+}
+
 func WaterLevelOnTimeDecoder(s string) (*types.WaterLevelOnTime, error) {
 
 	err := checkCodeBlock(s)
@@ -78,6 +78,10 @@ func WaterLevelOnTimeDecoder(s string) (*types.WaterLevelOnTime, error) {
 	waterlevel, err := strconv.Atoi(s[1:])
 	if err != nil {
 		return nil, fmt.Errorf("invalid waterlavel value")
+	}
+
+	if waterlevel > 5000 && waterlevel < 6000 {
+		waterlevel = 0 - waterlevel - 5000
 	}
 
 	response := types.WaterLevelOnTime(waterlevel)
@@ -100,7 +104,7 @@ func DeltaWaterLevelDecoder(s string) (*types.DeltaWaterLevel, error) {
 	}
 
 	if s[4] != '1' && s[4] != '2' {
-		return nil, fmt.Errorf("fifth character must be '1' or '2'")
+		return nil, fmt.Errorf("last character must be '1' or '2'")
 	}
 
 	delta, err := strconv.Atoi(s[1:4])
@@ -138,6 +142,10 @@ func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
 		return nil, fmt.Errorf("invalid waterlavel value")
 	}
 
+	if waterlevel > 5000 && waterlevel < 6000 {
+		waterlevel = 0 - waterlevel - 5000
+	}
+
 	response := types.WaterLevelOn20h(waterlevel)
 	return &response, nil
 }
@@ -153,15 +161,17 @@ func TemperatureDecoder(s string) (*types.Temperature, error) {
 		return nil, fmt.Errorf("first character must be '4'")
 	}
 
-	if s[1:] == "////" {
-		return nil, nil
-	}
+	// if s[1:] == "////" {
+	// 	return nil, nil
+	// }
 
+	//Может быть //
 	waterTemp, err := strconv.Atoi(s[1:3])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid water temperature value")
 	}
 
+	//Может быть //
 	AirTemp, err := strconv.Atoi(s[3:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid air temperature value")
@@ -186,6 +196,8 @@ func PhenomeniaDecoder(s string) ([]*types.Phenomenia, error) {
 	if s[0] != '5' {
 		return nil, fmt.Errorf("first character must be '5'")
 	}
+
+	//maybe ////
 
 	firstPhenomenia, err := strconv.Atoi(s[1:3])
 	if err != nil {
@@ -242,6 +254,14 @@ func IcePhenomeniaStateDecoder(s string) (*types.IcePhenomeniaState, error) {
 	return &response, nil
 }
 
+// Толщина льда 70454 {
+// Могут быть ///
+// 2-4 - толщина льда
+// Может быть /
+// 4 - высота снежного покрова
+// Новый енам 0 - 9
+//}
+
 func PrecipitationDecoder(s string) (*types.Precipitation, error) {
 
 	err := checkCodeBlock(s)
@@ -253,11 +273,13 @@ func PrecipitationDecoder(s string) (*types.Precipitation, error) {
 		return nil, fmt.Errorf("first character must be '0'")
 	}
 
+	// maybe ///
 	value, err := strconv.ParseFloat(s[1:4], 32)
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid precipitation value")
 	}
 
+	// maybe /
 	duration, err := strconv.Atoi(s[4:])
 	if err != nil || duration < 0 || duration > 4 {
 		return nil, fmt.Errorf("Ivalid duration value")
@@ -304,6 +326,8 @@ func HeadwaterLevelDecoder(s string) (*types.HeadwaterLevel, error) {
 	if s[0] != '1' {
 		return nil, fmt.Errorf("first character must be '1'")
 	}
+
+	//maybe ////
 	headwaterlevel, err := strconv.Atoi(s[1:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid headwater level value")
@@ -324,6 +348,7 @@ func AverageReservoirLevelDecoder(s string) (*types.AverageReservoirLevel, error
 		return nil, fmt.Errorf("first character must be '2'")
 	}
 
+	//maybe ////
 	waterlevel, err := strconv.Atoi(s[1:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid avarage waterlevel value")
@@ -340,11 +365,12 @@ func DownstreamLevelDecoder(s string) (*types.DownstreamLevel, error) {
 		return nil, err
 	}
 
-	if s[:2] != "40" {
-		return nil, fmt.Errorf("first characters must be '40'")
+	if s[0] != '4' {
+		return nil, fmt.Errorf("first characters must be '4'")
 	}
 
-	waterlevel, err := strconv.Atoi(s[2:])
+	// maybe ////
+	waterlevel, err := strconv.Atoi(s[1:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid downstream level value")
 	}
@@ -360,9 +386,13 @@ func ReservoirVolumeDecoder(s string) (*types.ReservoirVolume, error) {
 		return nil, err
 	}
 
-	if s[:2] != "75" {
+	if s[0] != '7' {
 		return nil, fmt.Errorf("first characters must be '75'")
 	}
+	// maybe ////
+	// второе число - количество целых в числе (до 5)
+	// 3-5 значение
+	// 72346 34.6 75346 34600
 
 	volume, err := strconv.Atoi(s[2:])
 	if err != nil {
@@ -393,21 +423,24 @@ func IsReservoirWaterInflowDecoder(s string) (*types.IsReservoirWaterInflow, err
 	}, nil
 }
 
-func ObPsDecoder(s string) (*types.ObPs, error) {
+func InflowDecoder(s string) (*types.Inflow, error) {
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
 	}
 
-	if s[:2] != "43" {
-		return nil, fmt.Errorf("first characters must be '43'")
+	if s[0] != '4' {
+		return nil, fmt.Errorf("first characters must be '4'")
 	}
+	// maybe ////
+	// второе - количество целых чисел от 1 до 5
+	// 3-5 значение
 
 	obps, err := strconv.Atoi(s[2:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid obps value")
 	}
-	response := types.ObPs(obps)
+	response := types.Inflow(obps)
 	return &response, nil
 }
 
@@ -417,9 +450,13 @@ func ResetDecoder(s string) (*types.Reset, error) {
 		return nil, err
 	}
 
-	if s[:2] != "73" {
-		return nil, fmt.Errorf("first characters must be '73'")
+	if s[0] != '7' {
+		return nil, fmt.Errorf("first characters must be '7'")
 	}
+
+	// maybe ////
+	// второе - количество целых чисел от 1 до 5
+	// 3-5 значение
 
 	reset, err := strconv.Atoi(s[2:])
 	if err != nil {
@@ -429,7 +466,7 @@ func ResetDecoder(s string) (*types.Reset, error) {
 	return &response, nil
 }
 
-func NextDayDecoder(s string) (*types.NextDay, error) {
+func PrevDayDecoder(s string) (*types.PrevDay, error) {
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
@@ -443,7 +480,7 @@ func NextDayDecoder(s string) (*types.NextDay, error) {
 		return nil, fmt.Errorf("invalid day value")
 	}
 
-	return &types.NextDay{
+	return &types.PrevDay{
 		IsNextDay: true,
 		Date:      byte(day),
 	}, nil
