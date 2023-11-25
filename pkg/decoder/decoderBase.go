@@ -603,7 +603,7 @@ func PrevDayDecoder(s string) (*types.PrevDay, error) {
 
 func checkCodeBlock(s string) error {
 
-	matched, err := regexp.MatchString(`^\d(////|\d{4})$`, s)
+	matched, err := regexp.MatchString(`^[0-9/]{5}$`, s)
 	if err != nil {
 		return fmt.Errorf("error while matching regex: %v", err)
 	}
