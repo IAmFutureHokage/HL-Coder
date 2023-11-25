@@ -31,6 +31,7 @@ type IceInfo struct {
 	Snow *SnowHeight
 }
 
+type Waterflow uint32
 type Precipitation struct {
 	Value    *float32
 	Duration *PrecipitationDuration

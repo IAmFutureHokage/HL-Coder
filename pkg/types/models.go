@@ -16,8 +16,8 @@ type ReservoirWaterInflow struct {
 
 type Telegram struct {
 	PostCode
+	DateAndTime
 	IsDangerous        IsDangerous
-	DateAndTime        DateAndTime
 	WaterLevelOnTime   WaterLevelOnTime
 	DeltaWaterLevel    DeltaWaterLevel
 	WaterLevelOn20h    WaterLevelOn20h
@@ -27,8 +27,4 @@ type Telegram struct {
 	Precipitation      Precipitation
 	IsReservoir        IsReservoir
 	Reservoir          Reservoir
-}
-
-type FullTelegram struct {
-	Telegram []Telegram
 }
