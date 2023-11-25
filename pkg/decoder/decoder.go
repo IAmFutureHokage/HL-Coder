@@ -11,6 +11,7 @@ func Decoder(s string) (*types.Telegram, error) {
 	codeBlocks := parseString(s)
 	telegram := &types.Telegram{}
 	var errG error
+	var isReservoir, isResevoirInflow = false, false
 
 	for i, block := range codeBlocks {
 
@@ -38,7 +39,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			}
 			errG = err
 		}
-		if i < 4 && telegram.WaterLevelOnTime == 0 {
+		if i < 4 && telegram.WaterLevelOnTime == 0 && !isReservoir && !isResevoirInflow {
 			waterLevel, err := WaterLevelOnTimeDecoder(block)
 			if err != nil {
 				return nil, err
@@ -46,7 +47,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.WaterLevelOnTime = *waterLevel
 			continue
 		}
-		if i < 5 && telegram.DeltaWaterLevel == 0 {
+		if i < 5 && telegram.DeltaWaterLevel == 0 && !isReservoir && !isResevoirInflow {
 			delta, err := DeltaWaterLevelDecoder(block)
 			if err != nil {
 				return nil, err
@@ -55,7 +56,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			continue
 
 		}
-		if i < 6 && telegram.WaterLevelOn20h == nil {
+		if i < 6 && telegram.WaterLevelOn20h == nil && !isReservoir && !isResevoirInflow {
 			waterLevel, err := WaterLevelOn20hDecoder(block)
 			if err == nil {
 				telegram.WaterLevelOn20h = waterLevel
@@ -64,7 +65,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			errG = err
 		}
 
-		if i < 7 && telegram.Temperature == nil {
+		if i < 7 && telegram.Temperature == nil && !isReservoir && !isResevoirInflow {
 			temperature, err := TemperatureDecoder(block)
 			if err == nil {
 				telegram.Temperature = temperature
@@ -73,7 +74,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			errG = err
 		}
 
-		if i < 13 {
+		if i < 13 && !isReservoir && !isResevoirInflow {
 			phenomenia, err := PhenomeniaDecoder(block)
 			if err == nil {
 				state := types.IcePhenomeniaState(1)
@@ -85,7 +86,9 @@ func Decoder(s string) (*types.Telegram, error) {
 			errG = err
 		}
 
-		if i < 8 && telegram.IcePhenomeniaState == nil && len(telegram.IcePhenomenia) == 0 {
+		if i < 8 && telegram.IcePhenomeniaState == nil &&
+			len(telegram.IcePhenomenia) == 0 &&
+			!isReservoir && !isResevoirInflow {
 			state, err := IcePhenomeniaStateDecoder(block)
 			if err == nil {
 				telegram.IcePhenomeniaState = state
@@ -94,7 +97,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			errG = err
 		}
 
-		if i < 14 && telegram.IceInfo == nil {
+		if i < 14 && telegram.IceInfo == nil && !isReservoir && !isResevoirInflow {
 			info, err := IceInfoDecoder(block)
 			if err == nil {
 				telegram.IceInfo = info
@@ -102,11 +105,86 @@ func Decoder(s string) (*types.Telegram, error) {
 			}
 			errG = err
 		}
-
-		if i < 15 && telegram.Precipitation == nil {
+		if i < 15 && telegram.Waterflow == nil && !isReservoir && !isResevoirInflow {
+			waterflow, err := WaterflowDecoder(block)
+			if err == nil {
+				telegram.Waterflow = waterflow
+				continue
+			}
+			errG = err
+		}
+		if i < 16 && telegram.Precipitation == nil && !isReservoir && !isResevoirInflow {
 			prec, err := PrecipitationDecoder(block)
 			if err == nil {
 				telegram.Precipitation = prec
+				continue
+			}
+			errG = err
+		}
+		if i < 17 && telegram.IsReservoir == nil && !isReservoir && !isResevoirInflow {
+			state, err := IsReservoirDecoder(block)
+			if err == nil {
+				telegram.Reservoir = &types.Reservoir{}
+				isReservoir = true
+				telegram.IsReservoir = state
+				continue
+			}
+			errG = err
+		}
+		if i < 18 && isReservoir && !isResevoirInflow {
+			data, err := HeadwaterLevelDecoder(block)
+			if err == nil {
+				telegram.Reservoir.HeadwaterLevel = data
+				continue
+			}
+			errG = err
+		}
+		if i < 19 && isReservoir && !isResevoirInflow {
+			data, err := AverageReservoirLevelDecoder(block)
+			if err == nil {
+				telegram.Reservoir.AverageReservoirLevel = data
+				continue
+			}
+			errG = err
+		}
+		if i < 20 && isReservoir && !isResevoirInflow {
+			data, err := DownstreamLevelDecoder(block)
+			if err == nil {
+				telegram.Reservoir.DownstreamLevel = data
+				continue
+			}
+			errG = err
+		}
+		if i < 21 && isReservoir && !isResevoirInflow {
+			data, err := ReservoirVolumeDecoder(block)
+			if err == nil {
+				telegram.Reservoir.ReservoirVolume = data
+				continue
+			}
+			errG = err
+		}
+		if i < 22 && !isResevoirInflow {
+			data, err := IsReservoirWaterInflowDecoder(block)
+			if err == nil {
+				telegram.ReservoirWaterInflow = &types.ReservoirWaterInflow{}
+				isResevoirInflow = true
+				telegram.IsReservoirWaterInflow = data
+				continue
+			}
+			errG = err
+		}
+		if i < 23 && isResevoirInflow {
+			data, err := InflowDecoder(block)
+			if err == nil {
+				telegram.ReservoirWaterInflow.Inflow = data
+				continue
+			}
+			errG = err
+		}
+		if isResevoirInflow {
+			data, err := ResetDecoder(block)
+			if err == nil {
+				telegram.ReservoirWaterInflow.Reset = data
 				continue
 			}
 			errG = err

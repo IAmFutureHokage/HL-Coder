@@ -26,10 +26,6 @@ func DateAndTimeDecoder(s string) (*types.DateAndTime, error) {
 		return nil, err
 	}
 
-	if s[4] != '1' {
-		return nil, fmt.Errorf("fifth character must be '1'")
-	}
-
 	day, err := strconv.Atoi(s[:2])
 	if err != nil || day > 31 {
 		return nil, fmt.Errorf("invalid day value")

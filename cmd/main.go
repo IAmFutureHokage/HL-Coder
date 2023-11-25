@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	inputString := "06022 22141 10350 20402="
+	inputString := "06275 24082 10414 20141 94424 19441 29453 40451 75647 95524 43139 74110="
 
 	telegram, err := decoder.Decoder(inputString)
 	if err != nil {
