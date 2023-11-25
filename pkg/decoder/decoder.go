@@ -151,7 +151,6 @@ func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
 }
 
 func TemperatureDecoder(s string) (*types.Temperature, error) {
-
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
@@ -161,29 +160,32 @@ func TemperatureDecoder(s string) (*types.Temperature, error) {
 		return nil, fmt.Errorf("first character must be '4'")
 	}
 
-	// if s[1:] == "////" {
-	// 	return nil, nil
-	// }
-
-	//Может быть //
-	waterTemp, err := strconv.Atoi(s[1:3])
-	if err != nil {
-		return nil, fmt.Errorf("Ivalid water temperature value")
+	var waterTempPtr *float32
+	if s[1:3] != "//" {
+		waterTemp, err := strconv.Atoi(s[1:3])
+		if err != nil {
+			return nil, fmt.Errorf("Invalid water temperature value")
+		}
+		waterTempFloat := float32(waterTemp) / 10.0
+		waterTempPtr = &waterTempFloat
 	}
 
-	//Может быть //
-	AirTemp, err := strconv.Atoi(s[3:])
-	if err != nil {
-		return nil, fmt.Errorf("Ivalid air temperature value")
-	}
-
-	if AirTemp > 50 {
-		AirTemp = 0 - AirTemp + 50
+	var airTempPtr *int8
+	if s[3:] != "//" {
+		airTemp, err := strconv.Atoi(s[3:])
+		if err != nil {
+			return nil, fmt.Errorf("Invalid air temperature value")
+		}
+		if airTemp > 50 {
+			airTemp = 0 - airTemp + 50
+		}
+		airTempInt8 := int8(airTemp)
+		airTempPtr = &airTempInt8
 	}
 
 	return &types.Temperature{
-		WaterTemperature: float32(waterTemp) / 10.0,
-		AirTemperature:   int8(AirTemp),
+		WaterTemperature: waterTempPtr,
+		AirTemperature:   airTempPtr,
 	}, nil
 }
 
@@ -197,7 +199,9 @@ func PhenomeniaDecoder(s string) ([]*types.Phenomenia, error) {
 		return nil, fmt.Errorf("first character must be '5'")
 	}
 
-	//maybe ////
+	if s[1:] == "////" {
+		return nil, nil
+	}
 
 	firstPhenomenia, err := strconv.Atoi(s[1:3])
 	if err != nil {

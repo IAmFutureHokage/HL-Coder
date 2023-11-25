@@ -16,8 +16,8 @@ type DeltaWaterLevel int16
 type WaterLevelOn20h uint16
 
 type Temperature struct {
-	WaterTemperature float32
-	AirTemperature   int8
+	WaterTemperature *float32
+	AirTemperature   *int8
 }
 
 type Phenomenia struct {
