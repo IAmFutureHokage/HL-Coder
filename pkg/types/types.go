@@ -26,6 +26,11 @@ type Phenomenia struct {
 	Intensity   *byte
 }
 
+type IceInfo struct {
+	Ice  *uint16
+	Snow *SnowHeight
+}
+
 type Precipitation struct {
 	Value    float32
 	Duration PrecipitationDuration

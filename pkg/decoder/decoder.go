@@ -258,13 +258,41 @@ func IcePhenomeniaStateDecoder(s string) (*types.IcePhenomeniaState, error) {
 	return &response, nil
 }
 
-// Толщина льда 70454 {
-// Могут быть ///
-// 2-4 - толщина льда
-// Может быть /
-// 4 - высота снежного покрова
-// Новый енам 0 - 9
-//}
+func IceInfoDecoder(s string) (*types.IceInfo, error) {
+	err := checkCodeBlock(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if s[0] != '7' {
+		return nil, fmt.Errorf("first character must be '7'")
+	}
+
+	var iceHeightPtr *uint16
+	if s[1:4] != "///" {
+		iceHeight, err := strconv.Atoi(s[1:4])
+		if err != nil {
+			return nil, fmt.Errorf("Invalid ice height value")
+		}
+		iceHeightUint := uint16(iceHeight)
+		iceHeightPtr = &iceHeightUint
+	}
+
+	var snowHeightPtr *types.SnowHeight
+	if s[4] != '/' {
+		snowHeight, err := strconv.Atoi(s[4:])
+		if err != nil {
+			return nil, fmt.Errorf("Invalid snow height value")
+		}
+		snowHeightbyte := types.SnowHeight(byte(snowHeight))
+		snowHeightPtr = &snowHeightbyte
+	}
+
+	return &types.IceInfo{
+		Ice:  iceHeightPtr,
+		Snow: snowHeightPtr,
+	}, nil
+}
 
 func PrecipitationDecoder(s string) (*types.Precipitation, error) {
 
