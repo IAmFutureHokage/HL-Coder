@@ -238,12 +238,10 @@ func PhenomeniaDecoder(s string) ([]*types.Phenomenia, error) {
 		{
 			Phenomen:    byte(firstPhenomenia),
 			IsUntensity: false,
-			Intensity:   nil,
 		},
 		{
 			Phenomen:    byte(secondPhenomenia),
 			IsUntensity: false,
-			Intensity:   nil,
 		},
 	}, nil
 }
@@ -295,7 +293,6 @@ func IceInfoDecoder(s string) (*types.IceInfo, error) {
 }
 
 func PrecipitationDecoder(s string) (*types.Precipitation, error) {
-
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
@@ -305,25 +302,35 @@ func PrecipitationDecoder(s string) (*types.Precipitation, error) {
 		return nil, fmt.Errorf("first character must be '0'")
 	}
 
-	// maybe ///
-	value, err := strconv.ParseFloat(s[1:4], 32)
-	if err != nil {
-		return nil, fmt.Errorf("Ivalid precipitation value")
+	var valuePtr *float32
+	if s[1:4] != "///" {
+		value, err := strconv.ParseFloat(s[1:4], 32)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid precipitation value")
+		}
+
+		if value >= 990 {
+			value = (value - 990) / 10
+		}
+
+		valueFloat32 := float32(value)
+		valuePtr = &valueFloat32
 	}
 
-	// maybe /
-	duration, err := strconv.Atoi(s[4:])
-	if err != nil || duration < 0 || duration > 4 {
-		return nil, fmt.Errorf("Ivalid duration value")
-	}
+	var durationPtr *types.PrecipitationDuration
+	if s[4:] != "/" {
+		duration, err := strconv.Atoi(s[4:])
+		if err != nil || duration < 0 || duration > 4 {
+			return nil, fmt.Errorf("Invalid duration value")
+		}
 
-	if value >= 990 {
-		value = (value - 990) / 10
+		durationPrecip := types.PrecipitationDuration(duration)
+		durationPtr = &durationPrecip
 	}
 
 	return &types.Precipitation{
-		Value:    float32(value),
-		Duration: types.PrecipitationDuration(duration),
+		Value:    valuePtr,
+		Duration: durationPtr,
 	}, nil
 }
 
@@ -359,7 +366,10 @@ func HeadwaterLevelDecoder(s string) (*types.HeadwaterLevel, error) {
 		return nil, fmt.Errorf("first character must be '1'")
 	}
 
-	//maybe ////
+	if s[1:] == "////" {
+		return nil, nil
+	}
+
 	headwaterlevel, err := strconv.Atoi(s[1:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid headwater level value")
@@ -380,7 +390,10 @@ func AverageReservoirLevelDecoder(s string) (*types.AverageReservoirLevel, error
 		return nil, fmt.Errorf("first character must be '2'")
 	}
 
-	//maybe ////
+	if s[1:] == "////" {
+		return nil, nil
+	}
+
 	waterlevel, err := strconv.Atoi(s[1:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid avarage waterlevel value")
@@ -401,7 +414,10 @@ func DownstreamLevelDecoder(s string) (*types.DownstreamLevel, error) {
 		return nil, fmt.Errorf("first characters must be '4'")
 	}
 
-	// maybe ////
+	if s[1:] == "////" {
+		return nil, nil
+	}
+
 	waterlevel, err := strconv.Atoi(s[1:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid downstream level value")
@@ -419,18 +435,29 @@ func ReservoirVolumeDecoder(s string) (*types.ReservoirVolume, error) {
 	}
 
 	if s[0] != '7' {
-		return nil, fmt.Errorf("first characters must be '75'")
+		return nil, fmt.Errorf("first characters must be '7'")
 	}
-	// maybe ////
-	// второе число - количество целых в числе (до 5)
-	// 3-5 значение
-	// 72346 34.6 75346 34600
+
+	if s[1:] == "////" {
+		return nil, nil
+	}
+
+	factor, err := strconv.Atoi(s[1:2])
+	if err != nil || factor < 1 || factor > 5 {
+		return nil, fmt.Errorf("Ivalid factor volume value")
+	}
 
 	volume, err := strconv.Atoi(s[2:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid volume value")
 	}
-	response := types.ReservoirVolume(volume * 100)
+
+	floatVolume := float64(volume) / 1000.0
+	for i := 0; i < factor; i++ {
+		floatVolume *= 10
+	}
+
+	response := types.ReservoirVolume(floatVolume)
 	return &response, nil
 }
 
@@ -464,15 +491,26 @@ func InflowDecoder(s string) (*types.Inflow, error) {
 	if s[0] != '4' {
 		return nil, fmt.Errorf("first characters must be '4'")
 	}
-	// maybe ////
-	// второе - количество целых чисел от 1 до 5
-	// 3-5 значение
-
-	obps, err := strconv.Atoi(s[2:])
-	if err != nil {
-		return nil, fmt.Errorf("Ivalid obps value")
+	if s[1:] == "////" {
+		return nil, nil
 	}
-	response := types.Inflow(obps)
+
+	factor, err := strconv.Atoi(s[1:2])
+	if err != nil || factor < 1 || factor > 5 {
+		return nil, fmt.Errorf("Ivalid factor inflow value")
+	}
+
+	inflow, err := strconv.Atoi(s[2:])
+	if err != nil {
+		return nil, fmt.Errorf("Ivalid oflow value")
+	}
+
+	floatInflow := float64(inflow) / 1000.0
+	for i := 0; i < factor; i++ {
+		floatInflow *= 10
+	}
+
+	response := types.Inflow(floatInflow)
 	return &response, nil
 }
 
@@ -486,15 +524,26 @@ func ResetDecoder(s string) (*types.Reset, error) {
 		return nil, fmt.Errorf("first characters must be '7'")
 	}
 
-	// maybe ////
-	// второе - количество целых чисел от 1 до 5
-	// 3-5 значение
+	if s[1:] == "////" {
+		return nil, nil
+	}
+
+	factor, err := strconv.Atoi(s[1:2])
+	if err != nil || factor < 1 || factor > 5 {
+		return nil, fmt.Errorf("Ivalid factor inflow value")
+	}
 
 	reset, err := strconv.Atoi(s[2:])
 	if err != nil {
 		return nil, fmt.Errorf("Ivalid reset value")
 	}
-	response := types.Reset(reset)
+
+	floatReset := float64(reset) / 1000.0
+	for i := 0; i < factor; i++ {
+		floatReset *= 10
+	}
+
+	response := types.Reset(floatReset)
 	return &response, nil
 }
 

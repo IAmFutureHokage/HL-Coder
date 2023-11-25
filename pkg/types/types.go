@@ -32,8 +32,8 @@ type IceInfo struct {
 }
 
 type Precipitation struct {
-	Value    float32
-	Duration PrecipitationDuration
+	Value    *float32
+	Duration *PrecipitationDuration
 }
 
 type IsReservoir struct {
