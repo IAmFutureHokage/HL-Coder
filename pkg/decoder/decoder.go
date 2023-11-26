@@ -6,6 +6,22 @@ import (
 	types "github.com/IAmFutureHokage/HL-Coder/pkg/types"
 )
 
+func FullDecoder(s string) ([]*types.Telegram, error) {
+
+	var telegrams = splitSequence(s)
+	var decodedTelegrams []*types.Telegram
+
+	for _, telegramStr := range telegrams {
+		decoded, err := Decoder(telegramStr)
+		if err != nil {
+			return nil, err
+		}
+		decodedTelegrams = append(decodedTelegrams, decoded)
+	}
+
+	return decodedTelegrams, nil
+}
+
 func Decoder(s string) (*types.Telegram, error) {
 
 	codeBlocks := parseString(s)
@@ -209,4 +225,31 @@ func parseString(input string) []string {
 	}
 
 	return result
+}
+
+func splitSequence(s string) []string {
+	blocks := strings.Fields(s)
+
+	if len(blocks) < 2 {
+		return nil
+	}
+
+	var sequences []string
+	firstBlock := blocks[0]
+
+	currentSequence := []string{firstBlock}
+	for _, block := range blocks[1:] {
+		if strings.HasPrefix(block, "922") {
+			if len(currentSequence) > 1 {
+				sequences = append(sequences, strings.Join(currentSequence, " "))
+			}
+			modifiedSecondBlock := block[3:5] + "081"
+			currentSequence = []string{firstBlock, modifiedSecondBlock}
+		} else {
+			currentSequence = append(currentSequence, block)
+		}
+	}
+	sequences = append(sequences, strings.Join(currentSequence, " "))
+
+	return sequences
 }
