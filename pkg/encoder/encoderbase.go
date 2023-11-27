@@ -41,3 +41,43 @@ func IsDangerousEncoder(d *types.IsDangerous) (string, error) {
 		return "", nil
 	}
 }
+
+func WaterLevelOnTimeEncoder(w *types.WaterLevelOnTime) (string, error) {
+
+	if w == nil {
+		return "", errors.New("WaterLevelOnTime is nil")
+	}
+
+	waterlevel := int(*w)
+
+	if waterlevel == 0 {
+		return "1////", nil
+	}
+
+	if waterlevel < 0 {
+		waterlevel = 5000 - waterlevel
+	}
+
+	return fmt.Sprintf("1%04d", waterlevel), nil
+}
+
+func DeltaWaterLevelEncoder(d *types.DeltaWaterLevel) (string, error) {
+
+	if d == nil {
+		return "", errors.New("DeltaWaterLevel is nil")
+	}
+
+	delta := int(*d)
+
+	if delta == 0 {
+		return "2////", nil
+	}
+
+	sign := '1'
+	if delta < 0 {
+		sign = '2'
+		delta = -delta
+	}
+
+	return fmt.Sprintf("2%03d%c", delta, sign), nil
+}
