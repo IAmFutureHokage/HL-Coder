@@ -143,3 +143,79 @@ func IcePhenomeniaStateEncoder(iceState *types.IcePhenomeniaState) (string, erro
 		return "", fmt.Errorf("invalid IcePhenomeniaState value: %d", *iceState)
 	}
 }
+
+func IceInfoEncoder(iceInfo *types.IceInfo) (string, error) {
+
+	if iceInfo == nil {
+		return "", errors.New("IceInfo is nil")
+	}
+
+	var iceHeightStr, snowHeightStr string
+
+	if iceInfo.Ice != nil {
+		iceHeightStr = fmt.Sprintf("%03d", *iceInfo.Ice)
+	} else {
+		iceHeightStr = "///"
+	}
+
+	if iceInfo.Snow != nil {
+		snowHeightStr = fmt.Sprintf("%d", *iceInfo.Snow)
+	} else {
+		snowHeightStr = "/"
+	}
+
+	return fmt.Sprintf("7%s%s", iceHeightStr, snowHeightStr), nil
+}
+
+func WaterflowEncoder(waterflow *types.Waterflow) (string, error) {
+
+	if waterflow == nil {
+		return "", errors.New("Waterflow is nil")
+	}
+
+	flow := float64(*waterflow)
+	var factor int
+	var scaledFlow float64
+
+	if flow == 0 {
+		return "8////", nil
+	} else {
+		for flow < 10000 && factor < 5 {
+			flow *= 10
+			factor++
+		}
+		if factor == 0 || factor > 5 {
+			return "", fmt.Errorf("invalid waterflow value for encoding: %f", flow)
+		}
+		scaledFlow = flow / 10.0
+	}
+
+	return fmt.Sprintf("8%d%04d", factor, uint32(scaledFlow)), nil
+}
+
+func PrecipitationEncoder(precip *types.Precipitation) (string, error) {
+
+	if precip == nil {
+		return "", errors.New("Precipitation is nil")
+	}
+
+	var valueStr, durationStr string
+
+	if precip.Value != nil {
+		value := float64(*precip.Value)
+		if value < 1 {
+			value = (value * 10) + 990
+		}
+		valueStr = fmt.Sprintf("%03d", int(value))
+	} else {
+		valueStr = "///"
+	}
+
+	if precip.Duration != nil {
+		durationStr = fmt.Sprintf("%d", *precip.Duration)
+	} else {
+		durationStr = "/"
+	}
+
+	return fmt.Sprintf("0%s%s", valueStr, durationStr), nil
+}
