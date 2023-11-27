@@ -219,3 +219,46 @@ func PrecipitationEncoder(precip *types.Precipitation) (string, error) {
 
 	return fmt.Sprintf("0%s%s", valueStr, durationStr), nil
 }
+
+func IsReservoirEncoder(reservoir *types.IsReservoir) (string, error) {
+
+	if reservoir == nil {
+		return "", errors.New("IsReservoir is nil")
+	}
+
+	if reservoir.Date > 31 {
+		return "", fmt.Errorf("invalid day value: %d", reservoir.Date)
+	}
+
+	return fmt.Sprintf("944%02d", reservoir.Date), nil
+}
+
+func HeadwaterLevelEncoder(headwater *types.HeadwaterLevel) (string, error) {
+
+	if headwater == nil {
+		return "", errors.New("HeadwaterLevel is nil")
+	}
+
+	headwaterLevel := int(*headwater)
+
+	if headwaterLevel == 0 {
+		return "1////", nil
+	} else {
+		return fmt.Sprintf("1%04d", headwaterLevel), nil
+	}
+}
+
+func AverageReservoirLevelEncoder(averageLevel *types.AverageReservoirLevel) (string, error) {
+
+	if averageLevel == nil {
+		return "", errors.New("AverageReservoirLevel is nil")
+	}
+
+	averageWaterLevel := int(*averageLevel)
+
+	if averageWaterLevel == 0 {
+		return "2////", nil
+	} else {
+		return fmt.Sprintf("2%04d", averageWaterLevel), nil
+	}
+}
