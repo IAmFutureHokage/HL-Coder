@@ -81,3 +81,65 @@ func DeltaWaterLevelEncoder(d *types.DeltaWaterLevel) (string, error) {
 
 	return fmt.Sprintf("2%03d%c", delta, sign), nil
 }
+
+func WaterLevelOn20hEncoder(w *types.WaterLevelOn20h) (string, error) {
+
+	if w == nil {
+		return "", errors.New("WaterLevelOn20h is nil")
+	}
+
+	waterlevel := int(*w)
+
+	if waterlevel == 0 {
+		return "3////", nil
+	}
+
+	if waterlevel < 0 {
+		waterlevel = 5000 - waterlevel
+	}
+
+	return fmt.Sprintf("3%04d", waterlevel), nil
+}
+
+func TemperatureEncoder(t *types.Temperature) (string, error) {
+
+	if t == nil {
+		return "", errors.New("Temperature is nil")
+	}
+
+	var waterTempStr, airTempStr string
+
+	if t.WaterTemperature != nil {
+		waterTemp := int(*t.WaterTemperature * 10)
+		waterTempStr = fmt.Sprintf("%02d", waterTemp)
+	} else {
+		waterTempStr = "//"
+	}
+
+	if t.AirTemperature != nil {
+		airTemp := int(*t.AirTemperature)
+		if airTemp < 0 {
+			airTemp = 50 - airTemp
+		}
+		airTempStr = fmt.Sprintf("%02d", airTemp)
+	} else {
+		airTempStr = "//"
+	}
+
+	return fmt.Sprintf("4%s%s", waterTempStr, airTempStr), nil
+}
+
+//Потом с ледовыми явлениями
+
+func IcePhenomeniaStateEncoder(iceState *types.IcePhenomeniaState) (string, error) {
+
+	if iceState == nil {
+		return "", errors.New("IcePhenomeniaState is nil")
+	}
+
+	if *iceState == 2 {
+		return "60000", nil
+	} else {
+		return "", fmt.Errorf("invalid IcePhenomeniaState value: %d", *iceState)
+	}
+}
