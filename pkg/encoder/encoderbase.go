@@ -303,3 +303,42 @@ func ReservoirVolumeEncoder(reservoirVolume *types.ReservoirVolume) (string, err
 
 	return fmt.Sprintf("7%d%04d", factor, uint32(scaledVolume)), nil
 }
+
+func IsReservoirWaterInflowEncoder(inflow *types.IsReservoirWaterInflow) (string, error) {
+
+	if inflow == nil {
+		return "", errors.New("IsReservoirWaterInflow is nil")
+	}
+
+	if inflow.Date > 31 {
+		return "", fmt.Errorf("invalid day value: %d", inflow.Date)
+	}
+
+	return fmt.Sprintf("955%02d", inflow.Date), nil
+}
+
+func InflowEncoder(inflow *types.Inflow) (string, error) {
+
+	if inflow == nil {
+		return "", errors.New("Inflow is nil")
+	}
+
+	flow := float64(*inflow)
+	var factor int
+	var scaledFlow float64
+
+	if flow == 0 {
+		return "4////", nil
+	} else {
+		for flow < 10000 && factor < 5 {
+			flow *= 10
+			factor++
+		}
+		if factor == 0 || factor > 5 {
+			return "", fmt.Errorf("invalid inflow value for encoding: %v", *inflow)
+		}
+		scaledFlow = flow / 10.0
+	}
+
+	return fmt.Sprintf("4%d%04d", factor, uint32(scaledFlow)), nil
+}
