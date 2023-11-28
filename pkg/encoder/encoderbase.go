@@ -12,6 +12,7 @@ func PostCodeEncoder(p *types.PostCode) (string, error) {
 	if p == nil {
 		return "", errors.New("PostCode is nil")
 	}
+
 	return string(*p), nil
 }
 
@@ -20,12 +21,15 @@ func DateAndTimeEncoder(d *types.DateAndTime) (string, error) {
 	if d == nil {
 		return "", errors.New("DateAndTime is nil")
 	}
+
 	if d.Date > 31 {
 		return "", fmt.Errorf("invalid day value: %d", d.Date)
 	}
+
 	if d.Time > 23 {
 		return "", fmt.Errorf("invalid hour value: %d", d.Time)
 	}
+
 	return fmt.Sprintf("%02d%02d1", d.Date, d.Time), nil
 }
 
@@ -37,9 +41,9 @@ func IsDangerousEncoder(d *types.IsDangerous) (string, error) {
 
 	if *d {
 		return "97701", nil
-	} else {
-		return "", nil
 	}
+
+	return "", nil
 }
 
 func WaterLevelOnTimeEncoder(w *types.WaterLevelOnTime) (string, error) {
@@ -74,6 +78,7 @@ func DeltaWaterLevelEncoder(d *types.DeltaWaterLevel) (string, error) {
 	}
 
 	sign := '1'
+
 	if delta < 0 {
 		sign = '2'
 		delta = -delta
@@ -107,13 +112,11 @@ func TemperatureEncoder(t *types.Temperature) (string, error) {
 		return "", errors.New("Temperature is nil")
 	}
 
-	var waterTempStr, airTempStr string
+	var waterTempStr, airTempStr = "//", "//"
 
 	if t.WaterTemperature != nil {
 		waterTemp := int(*t.WaterTemperature * 10)
 		waterTempStr = fmt.Sprintf("%02d", waterTemp)
-	} else {
-		waterTempStr = "//"
 	}
 
 	if t.AirTemperature != nil {
@@ -122,8 +125,6 @@ func TemperatureEncoder(t *types.Temperature) (string, error) {
 			airTemp = 50 - airTemp
 		}
 		airTempStr = fmt.Sprintf("%02d", airTemp)
-	} else {
-		airTempStr = "//"
 	}
 
 	return fmt.Sprintf("4%s%s", waterTempStr, airTempStr), nil
@@ -139,9 +140,9 @@ func IcePhenomeniaStateEncoder(iceState *types.IcePhenomeniaState) (string, erro
 
 	if *iceState == 2 {
 		return "60000", nil
-	} else {
-		return "", fmt.Errorf("invalid IcePhenomeniaState value: %d", *iceState)
 	}
+
+	return "", fmt.Errorf("invalid IcePhenomeniaState value: %d", *iceState)
 }
 
 func IceInfoEncoder(iceInfo *types.IceInfo) (string, error) {
@@ -150,18 +151,14 @@ func IceInfoEncoder(iceInfo *types.IceInfo) (string, error) {
 		return "", errors.New("IceInfo is nil")
 	}
 
-	var iceHeightStr, snowHeightStr string
+	var iceHeightStr, snowHeightStr = "///", "/"
 
 	if iceInfo.Ice != nil {
 		iceHeightStr = fmt.Sprintf("%03d", *iceInfo.Ice)
-	} else {
-		iceHeightStr = "///"
 	}
 
 	if iceInfo.Snow != nil {
 		snowHeightStr = fmt.Sprintf("%d", *iceInfo.Snow)
-	} else {
-		snowHeightStr = "/"
 	}
 
 	return fmt.Sprintf("7%s%s", iceHeightStr, snowHeightStr), nil
@@ -179,16 +176,18 @@ func WaterflowEncoder(waterflow *types.Waterflow) (string, error) {
 
 	if flow == 0 {
 		return "8////", nil
-	} else {
-		for flow < 10000 && factor < 5 {
-			flow *= 10
-			factor++
-		}
-		if factor == 0 || factor > 5 {
-			return "", fmt.Errorf("invalid waterflow value for encoding: %f", flow)
-		}
-		scaledFlow = flow / 10.0
 	}
+
+	for flow < 10000 && factor < 5 {
+		flow *= 10
+		factor++
+	}
+
+	if factor == 0 || factor > 5 {
+		return "", fmt.Errorf("invalid waterflow value for encoding: %f", flow)
+	}
+
+	scaledFlow = flow / 10.0
 
 	return fmt.Sprintf("8%d%04d", factor, uint32(scaledFlow)), nil
 }
@@ -199,7 +198,7 @@ func PrecipitationEncoder(precip *types.Precipitation) (string, error) {
 		return "", errors.New("Precipitation is nil")
 	}
 
-	var valueStr, durationStr string
+	var valueStr, durationStr = "///", "/"
 
 	if precip.Value != nil {
 		value := float64(*precip.Value)
@@ -207,14 +206,10 @@ func PrecipitationEncoder(precip *types.Precipitation) (string, error) {
 			value = (value * 10) + 990
 		}
 		valueStr = fmt.Sprintf("%03d", int(value))
-	} else {
-		valueStr = "///"
 	}
 
 	if precip.Duration != nil {
 		durationStr = fmt.Sprintf("%d", *precip.Duration)
-	} else {
-		durationStr = "/"
 	}
 
 	return fmt.Sprintf("0%s%s", valueStr, durationStr), nil
@@ -243,9 +238,9 @@ func HeadwaterLevelEncoder(headwater *types.HeadwaterLevel) (string, error) {
 
 	if headwaterLevel == 0 {
 		return "1////", nil
-	} else {
-		return fmt.Sprintf("1%04d", headwaterLevel), nil
 	}
+
+	return fmt.Sprintf("1%04d", headwaterLevel), nil
 }
 
 func AverageReservoirLevelEncoder(averageLevel *types.AverageReservoirLevel) (string, error) {
@@ -258,9 +253,9 @@ func AverageReservoirLevelEncoder(averageLevel *types.AverageReservoirLevel) (st
 
 	if averageWaterLevel == 0 {
 		return "2////", nil
-	} else {
-		return fmt.Sprintf("2%04d", averageWaterLevel), nil
 	}
+
+	return fmt.Sprintf("2%04d", averageWaterLevel), nil
 }
 
 func DownstreamLevelEncoder(downstreamLevel *types.DownstreamLevel) (string, error) {
@@ -290,16 +285,18 @@ func ReservoirVolumeEncoder(reservoirVolume *types.ReservoirVolume) (string, err
 
 	if volume == 0 {
 		return "7////", nil
-	} else {
-		for volume < 10000 && factor < 5 {
-			volume *= 10
-			factor++
-		}
-		if factor == 0 || factor > 5 {
-			return "", fmt.Errorf("invalid reservoir volume value for encoding: %v", *reservoirVolume)
-		}
-		scaledVolume = volume / 10.0
 	}
+
+	for volume < 10000 && factor < 5 {
+		volume *= 10
+		factor++
+	}
+
+	if factor == 0 || factor > 5 {
+		return "", fmt.Errorf("invalid reservoir volume value for encoding: %v", *reservoirVolume)
+	}
+
+	scaledVolume = volume / 10.0
 
 	return fmt.Sprintf("7%d%04d", factor, uint32(scaledVolume)), nil
 }
@@ -324,21 +321,24 @@ func InflowEncoder(inflow *types.Inflow) (string, error) {
 	}
 
 	flow := float64(*inflow)
+
 	var factor int
 	var scaledFlow float64
 
 	if flow == 0 {
 		return "4////", nil
-	} else {
-		for flow < 10000 && factor < 5 {
-			flow *= 10
-			factor++
-		}
-		if factor == 0 || factor > 5 {
-			return "", fmt.Errorf("invalid inflow value for encoding: %v", *inflow)
-		}
-		scaledFlow = flow / 10.0
 	}
+
+	for flow < 10000 && factor < 5 {
+		flow *= 10
+		factor++
+	}
+
+	if factor == 0 || factor > 5 {
+		return "", fmt.Errorf("invalid inflow value for encoding: %v", *inflow)
+	}
+
+	scaledFlow = flow / 10.0
 
 	return fmt.Sprintf("4%d%04d", factor, uint32(scaledFlow)), nil
 }
@@ -350,21 +350,24 @@ func ResetEncoder(reset *types.Reset) (string, error) {
 	}
 
 	value := float64(*reset)
+
 	var factor int
 	var scaledValue float64
 
 	if value == 0 {
 		return "7////", nil
-	} else {
-		for value < 10000 && factor < 5 {
-			value *= 10
-			factor++
-		}
-		if factor == 0 || factor > 5 {
-			return "", fmt.Errorf("invalid reset value for encoding: %v", *reset)
-		}
-		scaledValue = value / 10.0
 	}
+
+	for value < 10000 && factor < 5 {
+		value *= 10
+		factor++
+	}
+
+	if factor == 0 || factor > 5 {
+		return "", fmt.Errorf("invalid reset value for encoding: %v", *reset)
+	}
+
+	scaledValue = value / 10.0
 
 	return fmt.Sprintf("7%d%04d", factor, uint32(scaledValue)), nil
 }
