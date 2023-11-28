@@ -135,7 +135,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.Precipitation = prec
 			continue
 		}
-		if block[:3] == "944" && !isReservoir {
+		if block[:3] == "944" && !isReservoir && !isResevoirInflow {
 			state, err := IsReservoirDecoder(block)
 			if err != nil {
 				return nil, err
@@ -145,7 +145,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.IsReservoir = state
 			continue
 		}
-		if block[0] == '1' && isReservoir {
+		if block[0] == '1' && isReservoir && !isResevoirInflow {
 			data, err := HeadwaterLevelDecoder(block)
 			if err != nil {
 				return nil, err
@@ -153,7 +153,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.Reservoir.HeadwaterLevel = data
 			continue
 		}
-		if block[0] == '2' && isReservoir {
+		if block[0] == '2' && isReservoir && !isResevoirInflow {
 			data, err := AverageReservoirLevelDecoder(block)
 			if err != nil {
 				return nil, err
@@ -161,7 +161,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.Reservoir.AverageReservoirLevel = data
 			continue
 		}
-		if block[0] == '4' && isReservoir {
+		if block[0] == '4' && isReservoir && !isResevoirInflow {
 			data, err := DownstreamLevelDecoder(block)
 			if err != nil {
 				return nil, err
@@ -169,7 +169,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.Reservoir.DownstreamLevel = data
 			continue
 		}
-		if block[0] == '7' && isReservoir {
+		if block[0] == '7' && isReservoir && !isResevoirInflow {
 			data, err := ReservoirVolumeDecoder(block)
 			if err != nil {
 				return nil, err
