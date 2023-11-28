@@ -26,12 +26,12 @@ func Decoder(s string) (*types.Telegram, error) {
 
 	codeBlocks := parseString(s)
 	telegram := &types.Telegram{}
-	var errG error
+
 	var isReservoir, isResevoirInflow = false, false
 
 	for i, block := range codeBlocks {
 
-		if i < 1 && telegram.PostCode == "" {
+		if i == 0 {
 			postCode, err := PostCodeDecoder(block)
 			if err != nil {
 				return nil, err
@@ -39,7 +39,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.PostCode = *postCode
 			continue
 		}
-		if i < 2 && telegram.Date == 0 && telegram.Time == 0 {
+		if i == 1 {
 			dateAndTime, err := DateAndTimeDecoder(block)
 			if err != nil {
 				return nil, err
@@ -47,15 +47,15 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.DateAndTime = *dateAndTime
 			continue
 		}
-		if i < 3 {
+		if i == 2 && block[:3] == "977" {
 			isDangerous, err := IsDangerousDecoder(block)
-			if err == nil {
-				telegram.IsDangerous = *isDangerous
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.IsDangerous = *isDangerous
+			continue
 		}
-		if i < 4 && telegram.WaterLevelOnTime == 0 && !isReservoir && !isResevoirInflow {
+		if block[0] == '1' && !isReservoir && !isResevoirInflow {
 			waterLevel, err := WaterLevelOnTimeDecoder(block)
 			if err != nil {
 				return nil, err
@@ -63,7 +63,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			telegram.WaterLevelOnTime = *waterLevel
 			continue
 		}
-		if i < 5 && telegram.DeltaWaterLevel == 0 && !isReservoir && !isResevoirInflow {
+		if block[0] == '2' && !isReservoir && !isResevoirInflow {
 			delta, err := DeltaWaterLevelDecoder(block)
 			if err != nil {
 				return nil, err
@@ -72,142 +72,136 @@ func Decoder(s string) (*types.Telegram, error) {
 			continue
 
 		}
-		if i < 6 && telegram.WaterLevelOn20h == nil && !isReservoir && !isResevoirInflow {
+		if block[0] == '3' && !isReservoir && !isResevoirInflow {
 			waterLevel, err := WaterLevelOn20hDecoder(block)
-			if err == nil {
-				telegram.WaterLevelOn20h = waterLevel
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.WaterLevelOn20h = waterLevel
+			continue
 		}
 
-		if i < 7 && telegram.Temperature == nil && !isReservoir && !isResevoirInflow {
+		if block[0] == '4' && !isReservoir && !isResevoirInflow {
 			temperature, err := TemperatureDecoder(block)
-			if err == nil {
-				telegram.Temperature = temperature
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Temperature = temperature
+			continue
 		}
 
-		if i < 13 && !isReservoir && !isResevoirInflow {
+		if block[0] == '5' && !isReservoir && !isResevoirInflow {
 			phenomenia, err := PhenomeniaDecoder(block)
-			if err == nil {
-				state := types.IcePhenomeniaState(1)
-				telegram.IcePhenomeniaState = &state
-
-				telegram.IcePhenomenia = append(telegram.IcePhenomenia, phenomenia...)
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			state := types.IcePhenomeniaState(1)
+			telegram.IcePhenomeniaState = &state
+			telegram.IcePhenomenia = append(telegram.IcePhenomenia, phenomenia...)
+			continue
+
 		}
 
-		if i < 8 && telegram.IcePhenomeniaState == nil &&
-			len(telegram.IcePhenomenia) == 0 &&
-			!isReservoir && !isResevoirInflow {
+		if block[0] == '6' && !isReservoir && !isResevoirInflow {
 			state, err := IcePhenomeniaStateDecoder(block)
-			if err == nil {
-				telegram.IcePhenomeniaState = state
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.IcePhenomeniaState = state
+			continue
 		}
 
-		if i < 14 && telegram.IceInfo == nil && !isReservoir && !isResevoirInflow {
+		if block[0] == '7' && !isReservoir && !isResevoirInflow {
 			info, err := IceInfoDecoder(block)
-			if err == nil {
-				telegram.IceInfo = info
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.IceInfo = info
+			continue
 		}
-		if i < 15 && telegram.Waterflow == nil && !isReservoir && !isResevoirInflow {
+		if block[0] == '8' && !isReservoir && !isResevoirInflow {
 			waterflow, err := WaterflowDecoder(block)
-			if err == nil {
-				telegram.Waterflow = waterflow
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Waterflow = waterflow
+			continue
 		}
-		if i < 16 && telegram.Precipitation == nil && !isReservoir && !isResevoirInflow {
+		if block[0] == '0' && !isReservoir && !isResevoirInflow {
 			prec, err := PrecipitationDecoder(block)
-			if err == nil {
-				telegram.Precipitation = prec
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Precipitation = prec
+			continue
 		}
-		if i < 17 && telegram.IsReservoir == nil && !isReservoir && !isResevoirInflow {
+		if block[:3] == "944" && !isReservoir {
 			state, err := IsReservoirDecoder(block)
-			if err == nil {
-				telegram.Reservoir = &types.Reservoir{}
-				isReservoir = true
-				telegram.IsReservoir = state
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Reservoir = &types.Reservoir{}
+			isReservoir = true
+			telegram.IsReservoir = state
+			continue
 		}
-		if i < 18 && isReservoir && !isResevoirInflow {
+		if block[0] == '1' && isReservoir {
 			data, err := HeadwaterLevelDecoder(block)
-			if err == nil {
-				telegram.Reservoir.HeadwaterLevel = data
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Reservoir.HeadwaterLevel = data
+			continue
 		}
-		if i < 19 && isReservoir && !isResevoirInflow {
+		if block[0] == '2' && isReservoir {
 			data, err := AverageReservoirLevelDecoder(block)
-			if err == nil {
-				telegram.Reservoir.AverageReservoirLevel = data
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Reservoir.AverageReservoirLevel = data
+			continue
 		}
-		if i < 20 && isReservoir && !isResevoirInflow {
+		if block[0] == '4' && isReservoir {
 			data, err := DownstreamLevelDecoder(block)
-			if err == nil {
-				telegram.Reservoir.DownstreamLevel = data
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Reservoir.DownstreamLevel = data
+			continue
 		}
-		if i < 21 && isReservoir && !isResevoirInflow {
+		if block[0] == '7' && isReservoir {
 			data, err := ReservoirVolumeDecoder(block)
-			if err == nil {
-				telegram.Reservoir.ReservoirVolume = data
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.Reservoir.ReservoirVolume = data
+			continue
 		}
-		if i < 22 && !isResevoirInflow {
+		if block[:3] == "955" && !isResevoirInflow {
 			data, err := IsReservoirWaterInflowDecoder(block)
-			if err == nil {
-				telegram.ReservoirWaterInflow = &types.ReservoirWaterInflow{}
-				isResevoirInflow = true
-				telegram.IsReservoirWaterInflow = data
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.ReservoirWaterInflow = &types.ReservoirWaterInflow{}
+			isResevoirInflow = true
+			telegram.IsReservoirWaterInflow = data
+			continue
 		}
-		if i < 23 && isResevoirInflow {
+		if block[0] == '4' && isResevoirInflow {
 			data, err := InflowDecoder(block)
-			if err == nil {
-				telegram.ReservoirWaterInflow.Inflow = data
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
+			telegram.ReservoirWaterInflow.Inflow = data
+			continue
 		}
-		if isResevoirInflow {
+		if block[0] == '7' && isResevoirInflow {
 			data, err := ResetDecoder(block)
-			if err == nil {
-				telegram.ReservoirWaterInflow.Reset = data
-				continue
+			if err != nil {
+				return nil, err
 			}
-			errG = err
-		}
-
-		if errG != nil {
-			return nil, errG
+			telegram.ReservoirWaterInflow.Reset = data
+			continue
 		}
 	}
 
@@ -228,6 +222,7 @@ func parseString(input string) []string {
 }
 
 func splitSequence(s string) []string {
+
 	blocks := strings.Fields(s)
 
 	if len(blocks) < 2 {
@@ -238,6 +233,7 @@ func splitSequence(s string) []string {
 	firstBlock := blocks[0]
 
 	currentSequence := []string{firstBlock}
+
 	for _, block := range blocks[1:] {
 		if strings.HasPrefix(block, "922") {
 			if len(currentSequence) > 1 {
@@ -249,6 +245,7 @@ func splitSequence(s string) []string {
 			currentSequence = append(currentSequence, block)
 		}
 	}
+
 	sequences = append(sequences, strings.Join(currentSequence, " "))
 
 	return sequences
