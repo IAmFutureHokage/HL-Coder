@@ -3,6 +3,7 @@ package encoder
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/IAmFutureHokage/HL-Coder/pkg/types"
 )
@@ -130,7 +131,40 @@ func TemperatureEncoder(t *types.Temperature) (string, error) {
 	return fmt.Sprintf("4%s%s", waterTempStr, airTempStr), nil
 }
 
-//Потом с ледовыми явлениями
+func IcePhenomeniaEncoder(phenomenias []*types.Phenomenia) (string, error) {
+
+	if len(phenomenias) == 0 {
+		return "", errors.New("IcePhenomenia is empty")
+	}
+
+	var encodedStrings []string
+
+	for i := 0; i < len(phenomenias); {
+		current := phenomenias[i]
+
+		encodedString := fmt.Sprintf("5%02d", current.Phenomen)
+		if current.IsUntensity {
+			intensityStr := "  "
+			if current.Intensity != nil {
+				intensityStr = fmt.Sprintf("%02d", *current.Intensity)
+			}
+			encodedString += intensityStr
+			i++
+		} else {
+			nextPhenomenon := current.Phenomen
+			if i+1 < len(phenomenias) && !phenomenias[i+1].IsUntensity {
+				nextPhenomenon = phenomenias[i+1].Phenomen
+				i++
+			}
+			encodedString += fmt.Sprintf("%02d", nextPhenomenon)
+			i++
+		}
+
+		encodedStrings = append(encodedStrings, encodedString)
+	}
+
+	return strings.Join(encodedStrings, " "), nil
+}
 
 func IcePhenomeniaStateEncoder(iceState *types.IcePhenomeniaState) (string, error) {
 
