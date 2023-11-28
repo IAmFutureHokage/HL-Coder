@@ -342,3 +342,42 @@ func InflowEncoder(inflow *types.Inflow) (string, error) {
 
 	return fmt.Sprintf("4%d%04d", factor, uint32(scaledFlow)), nil
 }
+
+func ResetEncoder(reset *types.Reset) (string, error) {
+
+	if reset == nil {
+		return "", errors.New("Reset is nil")
+	}
+
+	value := float64(*reset)
+	var factor int
+	var scaledValue float64
+
+	if value == 0 {
+		return "7////", nil
+	} else {
+		for value < 10000 && factor < 5 {
+			value *= 10
+			factor++
+		}
+		if factor == 0 || factor > 5 {
+			return "", fmt.Errorf("invalid reset value for encoding: %v", *reset)
+		}
+		scaledValue = value / 10.0
+	}
+
+	return fmt.Sprintf("7%d%04d", factor, uint32(scaledValue)), nil
+}
+
+func PrevDayEncoder(prevDay *types.PrevDay) (string, error) {
+
+	if prevDay == nil {
+		return "", errors.New("PrevDay is nil")
+	}
+
+	if prevDay.Date > 31 {
+		return "", fmt.Errorf("invalid day value: %d", prevDay.Date)
+	}
+
+	return fmt.Sprintf("922%02d", prevDay.Date), nil
+}
