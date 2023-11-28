@@ -262,3 +262,44 @@ func AverageReservoirLevelEncoder(averageLevel *types.AverageReservoirLevel) (st
 		return fmt.Sprintf("2%04d", averageWaterLevel), nil
 	}
 }
+
+func DownstreamLevelEncoder(downstreamLevel *types.DownstreamLevel) (string, error) {
+
+	if downstreamLevel == nil {
+		return "", errors.New("DownstreamLevel is nil")
+	}
+
+	waterLevel := int(*downstreamLevel)
+
+	if waterLevel == 0 {
+		return "4////", nil
+	}
+
+	return fmt.Sprintf("4%04d", waterLevel), nil
+}
+
+func ReservoirVolumeEncoder(reservoirVolume *types.ReservoirVolume) (string, error) {
+
+	if reservoirVolume == nil {
+		return "", errors.New("ReservoirVolume is nil")
+	}
+
+	volume := float64(*reservoirVolume)
+	var factor int
+	var scaledVolume float64
+
+	if volume == 0 {
+		return "7////", nil
+	} else {
+		for volume < 10000 && factor < 5 {
+			volume *= 10
+			factor++
+		}
+		if factor == 0 || factor > 5 {
+			return "", fmt.Errorf("invalid reservoir volume value for encoding: %v", *reservoirVolume)
+		}
+		scaledVolume = volume / 10.0
+	}
+
+	return fmt.Sprintf("7%d%04d", factor, uint32(scaledVolume)), nil
+}

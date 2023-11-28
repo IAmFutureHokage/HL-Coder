@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	inputString := "06275 24082 10414 20141 95524 43139 74110="
+	inputString := "06275 24082 10414 20141 94424 19441 29453 40451 75647 95524 43139 74110"
 
 	telegram, err := decoder.FullDecoder(inputString)
 	if err != nil {
