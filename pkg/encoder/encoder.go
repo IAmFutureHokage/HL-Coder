@@ -25,13 +25,15 @@ func Encoder(hltel *types.Telegram) (string, error) {
 	builder.WriteRune(' ')
 	builder.WriteString(dateandtime)
 
-	isDangerous, err := IsDangerousEncoder(&hltel.IsDangerous)
-	if err != nil {
-		return "", err
-	}
+	if hltel.IsDangerous == true {
+		isDangerous, err := IsDangerousEncoder(&hltel.IsDangerous)
+		if err != nil {
+			return "", err
+		}
 
-	builder.WriteRune(' ')
-	builder.WriteString(isDangerous)
+		builder.WriteRune(' ')
+		builder.WriteString(isDangerous)
+	}
 
 	waterLevelOnT, err := WaterLevelOnTimeEncoder(&hltel.WaterLevelOnTime)
 	if err != nil {
@@ -167,7 +169,36 @@ func Encoder(hltel *types.Telegram) (string, error) {
 			builder.WriteRune(' ')
 			builder.WriteString(volume)
 		}
+	}
 
+	if hltel.IsReservoirWaterInflow != nil {
+		state, err := IsReservoirWaterInflowEncoder(hltel.IsReservoirWaterInflow)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(state)
+
+		if hltel.ReservoirWaterInflow.Inflow != nil {
+			inflow, err := InflowEncoder(hltel.ReservoirWaterInflow.Inflow)
+			if err != nil {
+				return "", err
+			}
+
+			builder.WriteRune(' ')
+			builder.WriteString(inflow)
+		}
+
+		if hltel.ReservoirWaterInflow.Reset != nil {
+			reset, err := ResetEncoder(hltel.ReservoirWaterInflow.Reset)
+			if err != nil {
+				return "", err
+			}
+
+			builder.WriteRune(' ')
+			builder.WriteString(reset)
+		}
 	}
 
 	return builder.String(), nil
