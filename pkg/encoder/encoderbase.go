@@ -50,12 +50,12 @@ func IsDangerousEncoder(d *types.IsDangerous) (string, error) {
 func WaterLevelOnTimeEncoder(w *types.WaterLevelOnTime) (string, error) {
 
 	if w == nil {
-		return "", errors.New("WaterLevelOnTime is nil")
+		return "", nil
 	}
 
 	waterlevel := int(*w)
 
-	if waterlevel == 0 {
+	if waterlevel == 32767 {
 		return "1////", nil
 	}
 
@@ -69,12 +69,12 @@ func WaterLevelOnTimeEncoder(w *types.WaterLevelOnTime) (string, error) {
 func DeltaWaterLevelEncoder(d *types.DeltaWaterLevel) (string, error) {
 
 	if d == nil {
-		return "", errors.New("DeltaWaterLevel is nil")
+		return "", nil
 	}
 
 	delta := int(*d)
 
-	if delta == 0 {
+	if delta == 32767 {
 		return "2////", nil
 	}
 
@@ -96,7 +96,7 @@ func WaterLevelOn20hEncoder(w *types.WaterLevelOn20h) (string, error) {
 
 	waterlevel := int(*w)
 
-	if waterlevel == 0 {
+	if waterlevel == 32767 {
 		return "3////", nil
 	}
 
@@ -133,7 +133,11 @@ func TemperatureEncoder(t *types.Temperature) (string, error) {
 
 func IcePhenomeniaEncoder(phenomenias []*types.Phenomenia) (string, error) {
 
-	if len(phenomenias) == 0 {
+	if phenomenias[0] == nil {
+		return "5////", nil
+	}
+
+	if phenomenias == nil {
 		return "", nil
 	}
 
@@ -168,15 +172,11 @@ func IcePhenomeniaEncoder(phenomenias []*types.Phenomenia) (string, error) {
 
 func IcePhenomeniaStateEncoder(iceState *types.IcePhenomeniaState) (string, error) {
 
-	if iceState == nil {
-		return "", nil
-	}
-
 	if *iceState == 2 {
 		return "60000", nil
 	}
 
-	return "", fmt.Errorf("invalid IcePhenomeniaState value: %d", *iceState)
+	return "", nil
 }
 
 func IceInfoEncoder(iceInfo *types.IceInfo) (string, error) {
@@ -205,6 +205,11 @@ func WaterflowEncoder(waterflow *types.Waterflow) (string, error) {
 	}
 
 	flow := float64(*waterflow)
+
+	if flow > 100000 {
+		return "8////", nil
+	}
+
 	var factor int
 
 	for flow > 1 {
@@ -265,7 +270,7 @@ func HeadwaterLevelEncoder(headwater *types.HeadwaterLevel) (string, error) {
 
 	headwaterLevel := int(*headwater)
 
-	if headwaterLevel == 0 {
+	if headwaterLevel == 4294967295 {
 		return "1////", nil
 	}
 
@@ -280,7 +285,7 @@ func AverageReservoirLevelEncoder(averageLevel *types.AverageReservoirLevel) (st
 
 	averageWaterLevel := int(*averageLevel)
 
-	if averageWaterLevel == 0 {
+	if averageWaterLevel == 4294967295 {
 		return "2////", nil
 	}
 
@@ -295,7 +300,7 @@ func DownstreamLevelEncoder(downstreamLevel *types.DownstreamLevel) (string, err
 
 	waterLevel := int(*downstreamLevel)
 
-	if waterLevel == 0 {
+	if waterLevel == 4294967295 {
 		return "4////", nil
 	}
 
@@ -311,7 +316,7 @@ func ReservoirVolumeEncoder(reservoirVolume *types.ReservoirVolume) (string, err
 	volume := float64(*reservoirVolume)
 	var factor int
 
-	if volume == 0 {
+	if volume > 100000 {
 		return "7////", nil
 	}
 
@@ -351,7 +356,7 @@ func InflowEncoder(inflow *types.Inflow) (string, error) {
 	flow := float64(*inflow)
 	var factor int
 
-	if flow == 0 {
+	if flow == 4294967295 {
 		return "4////", nil
 	}
 
@@ -378,7 +383,7 @@ func ResetEncoder(reset *types.Reset) (string, error) {
 	value := float64(*reset)
 	var factor int
 
-	if value == 0 {
+	if value == 4294967295 {
 		return "7////", nil
 	}
 

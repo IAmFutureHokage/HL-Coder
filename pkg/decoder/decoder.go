@@ -60,7 +60,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			if err != nil {
 				return nil, err
 			}
-			telegram.WaterLevelOnTime = *waterLevel
+			telegram.WaterLevelOnTime = waterLevel
 			continue
 		}
 		if block[0] == '2' && !isReservoir && !isResevoirInflow {
@@ -68,7 +68,7 @@ func Decoder(s string) (*types.Telegram, error) {
 			if err != nil {
 				return nil, err
 			}
-			telegram.DeltaWaterLevel = *delta
+			telegram.DeltaWaterLevel = delta
 			continue
 
 		}

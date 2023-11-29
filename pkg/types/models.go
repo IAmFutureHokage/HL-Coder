@@ -16,8 +16,8 @@ type Telegram struct {
 	PostCode PostCode
 	DateAndTime
 	IsDangerous            IsDangerous
-	WaterLevelOnTime       WaterLevelOnTime
-	DeltaWaterLevel        DeltaWaterLevel
+	WaterLevelOnTime       *WaterLevelOnTime
+	DeltaWaterLevel        *DeltaWaterLevel
 	WaterLevelOn20h        *WaterLevelOn20h
 	Temperature            *Temperature
 	IcePhenomeniaState     *IcePhenomeniaState

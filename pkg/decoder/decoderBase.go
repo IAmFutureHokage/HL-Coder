@@ -68,7 +68,8 @@ func WaterLevelOnTimeDecoder(s string) (*types.WaterLevelOnTime, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.WaterLevelOnTime(32767)
+		return &response, nil
 	}
 
 	waterlevel, err := strconv.Atoi(s[1:])
@@ -96,7 +97,8 @@ func DeltaWaterLevelDecoder(s string) (*types.DeltaWaterLevel, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.DeltaWaterLevel(32767)
+		return &response, nil
 	}
 
 	if s[4] != '1' && s[4] != '2' {
@@ -130,7 +132,8 @@ func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.WaterLevelOn20h(32767)
+		return &response, nil
 	}
 
 	waterlevel, err := strconv.Atoi(s[1:])
@@ -196,7 +199,7 @@ func PhenomeniaDecoder(s string) ([]*types.Phenomenia, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		return []*types.Phenomenia{nil}, nil
 	}
 
 	firstPhenomenia, err := strconv.Atoi(s[1:3])
@@ -300,7 +303,8 @@ func WaterflowDecoder(s string) (*types.Waterflow, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.Waterflow(4294967295)
+		return &response, nil
 	}
 
 	factor, err := strconv.Atoi(s[1:2])
@@ -397,7 +401,8 @@ func HeadwaterLevelDecoder(s string) (*types.HeadwaterLevel, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.HeadwaterLevel(4294967295)
+		return &response, nil
 	}
 
 	headwaterlevel, err := strconv.Atoi(s[1:])
@@ -421,7 +426,8 @@ func AverageReservoirLevelDecoder(s string) (*types.AverageReservoirLevel, error
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.AverageReservoirLevel(4294967295)
+		return &response, nil
 	}
 
 	waterlevel, err := strconv.Atoi(s[1:])
@@ -445,7 +451,8 @@ func DownstreamLevelDecoder(s string) (*types.DownstreamLevel, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.DownstreamLevel(4294967295)
+		return &response, nil
 	}
 
 	waterlevel, err := strconv.Atoi(s[1:])
@@ -469,7 +476,8 @@ func ReservoirVolumeDecoder(s string) (*types.ReservoirVolume, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.ReservoirVolume(200000)
+		return &response, nil
 	}
 
 	factor, err := strconv.Atoi(s[1:2])
@@ -521,8 +529,10 @@ func InflowDecoder(s string) (*types.Inflow, error) {
 	if s[0] != '4' {
 		return nil, fmt.Errorf("first characters must be '4'")
 	}
+
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.Inflow(4294967295)
+		return &response, nil
 	}
 
 	factor, err := strconv.Atoi(s[1:2])
@@ -555,7 +565,8 @@ func ResetDecoder(s string) (*types.Reset, error) {
 	}
 
 	if s[1:] == "////" {
-		return nil, nil
+		response := types.Reset(4294967295)
+		return &response, nil
 	}
 
 	factor, err := strconv.Atoi(s[1:2])

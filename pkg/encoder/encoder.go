@@ -35,21 +35,25 @@ func Encoder(hltel *types.Telegram) (string, error) {
 		builder.WriteString(isDangerous)
 	}
 
-	waterLevelOnT, err := WaterLevelOnTimeEncoder(&hltel.WaterLevelOnTime)
-	if err != nil {
-		return "", err
+	if hltel.WaterLevelOnTime != nil {
+		waterLevelOnT, err := WaterLevelOnTimeEncoder(hltel.WaterLevelOnTime)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(waterLevelOnT)
 	}
 
-	builder.WriteRune(' ')
-	builder.WriteString(waterLevelOnT)
+	if hltel.DeltaWaterLevel != nil {
+		delta, err := DeltaWaterLevelEncoder(hltel.DeltaWaterLevel)
+		if err != nil {
+			return "", err
+		}
 
-	delta, err := DeltaWaterLevelEncoder(&hltel.DeltaWaterLevel)
-	if err != nil {
-		return "", err
+		builder.WriteRune(' ')
+		builder.WriteString(delta)
 	}
-
-	builder.WriteRune(' ')
-	builder.WriteString(delta)
 
 	if hltel.WaterLevelOn20h != nil {
 		waterLevelOn20h, err := WaterLevelOn20hEncoder(hltel.WaterLevelOn20h)
@@ -87,8 +91,10 @@ func Encoder(hltel *types.Telegram) (string, error) {
 			return "", err
 		}
 
-		builder.WriteRune(' ')
-		builder.WriteString(icePhenomeniaState)
+		if icePhenomeniaState != "" {
+			builder.WriteRune(' ')
+			builder.WriteString(icePhenomeniaState)
+		}
 	}
 
 	if hltel.IceInfo != nil {
