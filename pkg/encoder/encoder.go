@@ -127,6 +127,47 @@ func Encoder(hltel *types.Telegram) (string, error) {
 
 		builder.WriteRune(' ')
 		builder.WriteString(isReservoir)
+
+		if hltel.Reservoir.HeadwaterLevel != nil {
+			headwater, err := HeadwaterLevelEncoder(hltel.Reservoir.HeadwaterLevel)
+			if err != nil {
+				return "", err
+			}
+
+			builder.WriteRune(' ')
+			builder.WriteString(headwater)
+		}
+
+		if hltel.Reservoir.AverageReservoirLevel != nil {
+			avarage, err := AverageReservoirLevelEncoder(hltel.Reservoir.AverageReservoirLevel)
+			if err != nil {
+				return "", err
+			}
+
+			builder.WriteRune(' ')
+			builder.WriteString(avarage)
+		}
+
+		if hltel.Reservoir.DownstreamLevel != nil {
+			downstreamLevel, err := DownstreamLevelEncoder(hltel.Reservoir.DownstreamLevel)
+			if err != nil {
+				return "", err
+			}
+
+			builder.WriteRune(' ')
+			builder.WriteString(downstreamLevel)
+		}
+
+		if hltel.Reservoir.ReservoirVolume != nil {
+			volume, err := ReservoirVolumeEncoder(hltel.Reservoir.ReservoirVolume)
+			if err != nil {
+				return "", err
+			}
+
+			builder.WriteRune(' ')
+			builder.WriteString(volume)
+		}
+
 	}
 
 	return builder.String(), nil
