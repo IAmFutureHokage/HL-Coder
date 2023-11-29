@@ -59,7 +59,7 @@ func Encoder(hltel *types.Telegram) (string, error) {
 		builder.WriteString(waterLevelOn20h)
 	}
 
-	if hltel.WaterLevelOn20h != nil {
+	if hltel.Temperature != nil {
 		temperature, err := TemperatureEncoder(hltel.Temperature)
 		if err != nil {
 			return "", err
@@ -67,6 +67,66 @@ func Encoder(hltel *types.Telegram) (string, error) {
 
 		builder.WriteRune(' ')
 		builder.WriteString(temperature)
+	}
+
+	if len(hltel.IcePhenomenia) > 0 {
+		phenomenias, err := IcePhenomeniaEncoder(hltel.IcePhenomenia)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(phenomenias)
+	}
+
+	if hltel.IcePhenomeniaState != nil {
+		icePhenomeniaState, err := IcePhenomeniaStateEncoder(hltel.IcePhenomeniaState)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(icePhenomeniaState)
+	}
+
+	if hltel.IceInfo != nil {
+		iceInfo, err := IceInfoEncoder(hltel.IceInfo)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(iceInfo)
+	}
+
+	if hltel.Waterflow != nil {
+		waterflow, err := WaterflowEncoder(hltel.Waterflow)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(waterflow)
+	}
+
+	if hltel.Precipitation != nil {
+		precipitation, err := PrecipitationEncoder(hltel.Precipitation)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(precipitation)
+	}
+
+	if hltel.IsReservoir != nil {
+		isReservoir, err := IsReservoirEncoder(hltel.IsReservoir)
+		if err != nil {
+			return "", err
+		}
+
+		builder.WriteRune(' ')
+		builder.WriteString(isReservoir)
 	}
 
 	return builder.String(), nil
