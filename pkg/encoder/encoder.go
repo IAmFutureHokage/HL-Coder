@@ -45,7 +45,7 @@ func FullEncoder(hltels []*types.Telegram) (string, error) {
 		}
 	}
 
-	return strings.Join(encodedStrings, " "), nil
+	return strings.Join(encodedStrings, " ") + "=", nil
 }
 
 func Encoder(hltel *types.Telegram) (string, error) {
