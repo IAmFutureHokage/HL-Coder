@@ -1,10 +1,52 @@
 package encoder
 
 import (
+	"errors"
+	"sort"
 	"strings"
 
 	"github.com/IAmFutureHokage/HL-Coder/pkg/types"
 )
+
+func FullEncoder(hltels []*types.Telegram) (string, error) {
+
+	if len(hltels) == 0 {
+		return "", errors.New("no telegrams provided")
+	}
+
+	commonPostCode := hltels[0].PostCode
+	for _, tel := range hltels {
+		if tel.PostCode != commonPostCode || tel.DateAndTime.Time != 8 {
+			return "", errors.New("telegrams do not meet the criteria")
+		}
+	}
+
+	sort.Slice(hltels, func(i, j int) bool {
+		return hltels[i].DateAndTime.Date > hltels[j].DateAndTime.Date
+	})
+
+	var encodedStrings []string
+
+	for i, tel := range hltels {
+		encoded, err := Encoder(tel)
+		if err != nil {
+			return "", err
+		}
+
+		parts := strings.Fields(encoded)
+		if len(parts) < 2 {
+			return "", errors.New("invalid encoded telegram format")
+		}
+
+		if i == 0 {
+			encodedStrings = append(encodedStrings, encoded)
+		} else {
+			encodedStrings = append(encodedStrings, "922"+parts[1][:2]+" "+strings.Join(parts[2:], " "))
+		}
+	}
+
+	return strings.Join(encodedStrings, " "), nil
+}
 
 func Encoder(hltel *types.Telegram) (string, error) {
 
