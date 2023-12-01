@@ -400,16 +400,3 @@ func ResetEncoder(reset *types.Reset) (string, error) {
 
 	return fmt.Sprintf("7%d%03d", factor, uint32(scaledValue)), nil
 }
-
-func PrevDayEncoder(prevDay *types.PrevDay) (string, error) {
-
-	if prevDay == nil {
-		return "", errors.New("PrevDay is nil")
-	}
-
-	if prevDay.Date > 31 {
-		return "", fmt.Errorf("invalid day value: %d", prevDay.Date)
-	}
-
-	return fmt.Sprintf("922%02d", prevDay.Date), nil
-}

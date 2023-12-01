@@ -588,26 +588,6 @@ func ResetDecoder(s string) (*types.Reset, error) {
 	return &response, nil
 }
 
-func PrevDayDecoder(s string) (*types.PrevDay, error) {
-	err := checkCodeBlock(s)
-	if err != nil {
-		return nil, err
-	}
-	if s[:3] != "922" {
-		return nil, fmt.Errorf("Invalid 922 data")
-	}
-
-	day, err := strconv.Atoi(s[3:])
-	if err != nil || day > 31 {
-		return nil, fmt.Errorf("invalid day value")
-	}
-
-	return &types.PrevDay{
-		IsNextDay: true,
-		Date:      byte(day),
-	}, nil
-}
-
 func checkCodeBlock(s string) error {
 
 	matched, err := regexp.MatchString(`^[0-9/]{5}$`, s)
