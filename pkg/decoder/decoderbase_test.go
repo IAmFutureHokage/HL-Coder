@@ -989,3 +989,172 @@ func TestReservoirVolumeDecoder(t *testing.T) {
 		})
 	}
 }
+
+func TestIsReservoirWaterInflowDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.IsReservoirWaterInflow
+		wantErr bool
+	}{
+		{
+			name:  "Valid IsReservoirWaterInflow",
+			input: "95515",
+			want: &types.IsReservoirWaterInflow{
+				IsReservoirWaterInflow: true,
+				Date:                   15,
+			},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid IsReservoirWaterInflow - wrong prefix",
+			input:   "95615",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid IsReservoirWaterInflow - non-numeric date",
+			input:   "955ab",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid IsReservoirWaterInflow - invalid date",
+			input:   "95532",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IsReservoirWaterInflowDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsReservoirWaterInflowDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && (*got != *tt.want) {
+				t.Errorf("IsReservoirWaterInflowDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestInflowDecoder(t *testing.T) {
+
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.Inflow
+		wantErr bool
+	}{
+		{
+			name:    "Valid Inflow",
+			input:   "42234",
+			want:    func() *types.Inflow { inf := types.Inflow(23.4); return &inf }(),
+			wantErr: false,
+		},
+		{
+			name:    "Valid Inflow - NaN value",
+			input:   "4////",
+			want:    func() *types.Inflow { inf := types.Inflow(4294967295); return &inf }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Inflow - wrong format",
+			input:   "5abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Inflow - non-numeric factor",
+			input:   "4a234",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Inflow - non-numeric inflow",
+			input:   "412ab",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Inflow - invalid factor",
+			input:   "40678",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := InflowDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("InflowDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("InflowDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestResetDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.Reset
+		wantErr bool
+	}{
+		{
+			name:    "Valid Reset",
+			input:   "74234",
+			want:    func() *types.Reset { r := types.Reset(2340); return &r }(),
+			wantErr: false,
+		},
+		{
+			name:    "Valid Reset - NaN value",
+			input:   "7////",
+			want:    func() *types.Reset { r := types.Reset(4294967295); return &r }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Reset - wrong format",
+			input:   "8abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Reset - non-numeric factor",
+			input:   "7a234",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Reset - non-numeric reset value",
+			input:   "712ab",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Reset - invalid factor",
+			input:   "70678",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ResetDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ResetDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("ResetDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}

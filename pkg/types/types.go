@@ -55,9 +55,9 @@ type IsReservoirWaterInflow struct {
 	Date                   byte
 }
 
-type Inflow uint32
+type Inflow float32
 
-type Reset uint32
+type Reset float32
 
 type PrevDay struct {
 	IsNextDay bool

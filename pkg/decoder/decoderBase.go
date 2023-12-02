@@ -539,6 +539,7 @@ func IsReservoirWaterInflowDecoder(s string) (*types.IsReservoirWaterInflow, err
 }
 
 func InflowDecoder(s string) (*types.Inflow, error) {
+
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
