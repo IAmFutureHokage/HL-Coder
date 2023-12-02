@@ -738,3 +738,254 @@ func TestPrecipitationDecoder(t *testing.T) {
 		})
 	}
 }
+
+func TestIsReservoirDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.IsReservoir
+		wantErr bool
+	}{
+		{
+			name:  "Valid IsReservoir",
+			input: "94415",
+			want: &types.IsReservoir{
+				State: true,
+				Date:  15,
+			},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid IsReservoir - wrong prefix",
+			input:   "94515",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid IsReservoir - non-numeric date",
+			input:   "944ab",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid IsReservoir - invalid date",
+			input:   "94432",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IsReservoirDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsReservoirDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && (*got != *tt.want) {
+				t.Errorf("IsReservoirDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestHeadwaterLevelDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.HeadwaterLevel
+		wantErr bool
+	}{
+		{
+			name:    "Valid Headwater Level",
+			input:   "11234",
+			want:    func() *types.HeadwaterLevel { hl := types.HeadwaterLevel(1234); return &hl }(),
+			wantErr: false,
+		},
+		{
+			name:    "Valid Headwater Level - NaN value",
+			input:   "1////",
+			want:    func() *types.HeadwaterLevel { hl := types.HeadwaterLevel(4294967295); return &hl }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Headwater Level - wrong format",
+			input:   "2abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Headwater Level - non-numeric value",
+			input:   "1abcd",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := HeadwaterLevelDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("HeadwaterLevelDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("HeadwaterLevelDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestAverageReservoirLevelDecoder(t *testing.T) {
+
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.AverageReservoirLevel
+		wantErr bool
+	}{
+		{
+			name:    "Valid Average Reservoir Level",
+			input:   "21234",
+			want:    func() *types.AverageReservoirLevel { lvl := types.AverageReservoirLevel(1234); return &lvl }(),
+			wantErr: false,
+		},
+		{
+			name:    "Valid Average Reservoir Level - NaN value",
+			input:   "2////",
+			want:    func() *types.AverageReservoirLevel { lvl := types.AverageReservoirLevel(4294967295); return &lvl }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Average Reservoir Level - wrong format",
+			input:   "3abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Average Reservoir Level - non-numeric value",
+			input:   "2abcd",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := AverageReservoirLevelDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("AverageReservoirLevelDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("AverageReservoirLevelDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestDownstreamLevelDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.DownstreamLevel
+		wantErr bool
+	}{
+		{
+			name:    "Valid Downstream Level",
+			input:   "41234",
+			want:    func() *types.DownstreamLevel { lvl := types.DownstreamLevel(1234); return &lvl }(),
+			wantErr: false,
+		},
+		{
+			name:    "Valid Downstream Level - NaN value",
+			input:   "4////",
+			want:    func() *types.DownstreamLevel { lvl := types.DownstreamLevel(4294967295); return &lvl }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Downstream Level - wrong format",
+			input:   "5abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Downstream Level - non-numeric value",
+			input:   "4abcd",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := DownstreamLevelDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DownstreamLevelDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("DownstreamLevelDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestReservoirVolumeDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.ReservoirVolume
+		wantErr bool
+	}{
+		{
+			name:    "Valid Reservoir Volume",
+			input:   "75234",
+			want:    func() *types.ReservoirVolume { vol := types.ReservoirVolume(23400); return &vol }(),
+			wantErr: false,
+		},
+		{
+			name:    "Valid Reservoir Volume - NaN value",
+			input:   "7////",
+			want:    func() *types.ReservoirVolume { vol := types.ReservoirVolume(200000); return &vol }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Reservoir Volume - wrong format",
+			input:   "8abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Reservoir Volume - non-numeric factor",
+			input:   "7a234",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Reservoir Volume - non-numeric volume",
+			input:   "712ab",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Reservoir Volume - invalid factor",
+			input:   "70678",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ReservoirVolumeDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReservoirVolumeDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("ReservoirVolumeDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
