@@ -392,3 +392,349 @@ func TestTemperatureDecoder(t *testing.T) {
 		})
 	}
 }
+
+func TestPhenomeniaDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    []*types.Phenomenia
+		wantErr bool
+	}{
+		{
+			name:  "Valid Phenomenia - single value",
+			input: "51234",
+			want: []*types.Phenomenia{
+				{
+					Phenomen:    12,
+					IsUntensity: false,
+				},
+				{
+					Phenomen:    34,
+					IsUntensity: false,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Valid Phenomenia - same values",
+			input: "51212",
+			want: []*types.Phenomenia{
+				{
+					Phenomen:    12,
+					IsUntensity: false,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Valid Phenomenia - intensity",
+			input: "51210",
+			want: []*types.Phenomenia{
+				{
+					Phenomen:    12,
+					IsUntensity: true,
+					Intensity:   func() *byte { b := byte(10); return &b }(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Phenomenia - wrong format",
+			input:   "6abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Phenomenia - non-numeric value",
+			input:   "5ab//",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Valid Phenomenia - no data",
+			input:   "5////",
+			want:    []*types.Phenomenia{nil},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := PhenomeniaDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PhenomeniaDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if len(got) != len(tt.want) {
+				t.Errorf("PhenomeniaDecoder() got %v items, want %v items", len(got), len(tt.want))
+				return
+			}
+			for i := range got {
+				if got[i] != nil && tt.want[i] != nil {
+					if got[i].Phenomen != tt.want[i].Phenomen || got[i].IsUntensity != tt.want[i].IsUntensity {
+						t.Errorf("PhenomeniaDecoder() item %d = %v, want %v", i, got[i], tt.want[i])
+					}
+					if got[i].Intensity != nil && tt.want[i].Intensity != nil && *got[i].Intensity != *tt.want[i].Intensity {
+						t.Errorf("PhenomeniaDecoder() item %d Intensity = %v, want %v", i, *got[i].Intensity, *tt.want[i].Intensity)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestIcePhenomeniaStateDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.IcePhenomeniaState
+		wantErr bool
+	}{
+		{
+			name:    "Valid Ice Phenomenia State",
+			input:   "60000",
+			want:    func() *types.IcePhenomeniaState { s := types.IcePhenomeniaState(2); return &s }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Ice Phenomenia State - wrong value",
+			input:   "60001",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IcePhenomeniaStateDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IcePhenomeniaStateDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("IcePhenomeniaStateDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestIceInfoDecoder(t *testing.T) {
+
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.IceInfo
+		wantErr bool
+	}{
+		{
+			name:  "Valid Ice Info - both ice and snow height present",
+			input: "70102",
+			want: &types.IceInfo{
+				Ice:  func() *uint16 { h := uint16(10); return &h }(),
+				Snow: func() *types.SnowHeight { sh := types.SnowHeight(2); return &sh }(),
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Valid Ice Info - only ice height",
+			input: "7010/",
+			want: &types.IceInfo{
+				Ice:  func() *uint16 { h := uint16(10); return &h }(),
+				Snow: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Valid Ice Info - only snow height",
+			input: "7///2",
+			want: &types.IceInfo{
+				Ice:  nil,
+				Snow: func() *types.SnowHeight { sh := types.SnowHeight(2); return &sh }(),
+			},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Ice Info - wrong format",
+			input:   "8abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Ice Info - non-numeric ice height",
+			input:   "7ab//",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Ice Info - non-numeric snow height",
+			input:   "7///a",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IceInfoDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IceInfoDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil {
+				if got.Ice != nil && tt.want.Ice != nil && *got.Ice != *tt.want.Ice {
+					t.Errorf("IceInfoDecoder() Ice = %v, want %v", *got.Ice, *tt.want.Ice)
+				}
+				if got.Snow != nil && tt.want.Snow != nil && *got.Snow != *tt.want.Snow {
+					t.Errorf("IceInfoDecoder() Snow = %v, want %v", *got.Snow, *tt.want.Snow)
+				}
+			}
+		})
+	}
+}
+
+func TestWaterflowDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.Waterflow
+		wantErr bool
+	}{
+		{
+			name:    "Valid Waterflow",
+			input:   "83234",
+			want:    func() *types.Waterflow { wf := types.Waterflow(234); return &wf }(),
+			wantErr: false,
+		},
+		{
+			name:    "Valid Waterflow - NaN value",
+			input:   "8////",
+			want:    func() *types.Waterflow { wf := types.Waterflow(4294967295); return &wf }(),
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Waterflow - wrong format",
+			input:   "9abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Waterflow - non-numeric factor",
+			input:   "8a234",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Waterflow - non-numeric flow",
+			input:   "812ab",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Waterflow - invalid factor",
+			input:   "80678",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := WaterflowDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WaterflowDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil && *got != *tt.want {
+				t.Errorf("WaterflowDecoder() = %v, want %v", *got, *tt.want)
+			}
+		})
+	}
+}
+
+func TestPrecipitationDecoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    *types.Precipitation
+		wantErr bool
+	}{
+		{
+			name:  "Valid Precipitation - value and duration",
+			input: "09994",
+			want: &types.Precipitation{
+				Value:    func() *float32 { v := float32(0.9); return &v }(),
+				Duration: func() *types.PrecipitationDuration { d := types.PrecipitationDuration(4); return &d }(),
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Valid Precipitation - only value",
+			input: "0999/",
+			want: &types.Precipitation{
+				Value:    func() *float32 { v := float32(0.9); return &v }(),
+				Duration: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Valid Precipitation - only duration",
+			input: "0///4",
+			want: &types.Precipitation{
+				Value:    nil,
+				Duration: func() *types.PrecipitationDuration { d := types.PrecipitationDuration(4); return &d }(),
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Valid Precipitation - nil data",
+			input: "0////",
+			want: &types.Precipitation{
+				Value:    nil,
+				Duration: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Precipitation - wrong format",
+			input:   "1abcd",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Precipitation - non-numeric value",
+			input:   "0ab//",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Precipitation - non-numeric duration",
+			input:   "0////a",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Invalid Precipitation - invalid duration",
+			input:   "0////5",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := PrecipitationDecoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PrecipitationDecoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && tt.want != nil {
+				if got.Value != nil && tt.want.Value != nil && *got.Value != *tt.want.Value {
+					t.Errorf("PrecipitationDecoder() Value = %v, want %v", *got.Value, *tt.want.Value)
+				}
+				if got.Duration != nil && tt.want.Duration != nil && *got.Duration != *tt.want.Duration {
+					t.Errorf("PrecipitationDecoder() Duration = %v, want %v", *got.Duration, *tt.want.Duration)
+				}
+			}
+		})
+	}
+}

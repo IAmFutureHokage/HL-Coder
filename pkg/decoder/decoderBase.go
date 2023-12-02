@@ -344,6 +344,7 @@ func WaterflowDecoder(s string) (*types.Waterflow, error) {
 }
 
 func PrecipitationDecoder(s string) (*types.Precipitation, error) {
+
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
