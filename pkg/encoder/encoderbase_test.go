@@ -322,3 +322,92 @@ func TestTemperatureEncoder(t *testing.T) {
 		})
 	}
 }
+
+func TestIcePhenomeniaEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   []*types.Phenomenia
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "Valid IcePhenomenia - single phenomenia",
+			input: []*types.Phenomenia{
+				{Phenomen: 12, IsUntensity: false},
+			},
+			want:    "51212",
+			wantErr: false,
+		},
+		{
+			name: "Valid IcePhenomenia - multiple phenomenias",
+			input: []*types.Phenomenia{
+				{Phenomen: 12, IsUntensity: false},
+				{Phenomen: 34, IsUntensity: false},
+			},
+			want:    "51234",
+			wantErr: false,
+		},
+		{
+			name: "Valid IcePhenomenia - with intensity",
+			input: []*types.Phenomenia{
+				{Phenomen: 12, IsUntensity: true, Intensity: func() *byte { b := byte(10); return &b }()},
+			},
+			want:    "51210",
+			wantErr: false,
+		},
+		{
+			name:    "First element nil",
+			input:   []*types.Phenomenia{nil},
+			want:    "5////",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IcePhenomeniaEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IcePhenomeniaEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IcePhenomeniaEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIcePhenomeniaStateEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.IcePhenomeniaState
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid IcePhenomeniaState - 2",
+			input:   func() *types.IcePhenomeniaState { s := types.IcePhenomeniaState(2); return &s }(),
+			want:    "60000",
+			wantErr: false,
+		},
+		{
+			name:    "Valid IcePhenomeniaState - not 2",
+			input:   func() *types.IcePhenomeniaState { s := types.IcePhenomeniaState(1); return &s }(),
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IcePhenomeniaStateEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IcePhenomeniaStateEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IcePhenomeniaStateEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
