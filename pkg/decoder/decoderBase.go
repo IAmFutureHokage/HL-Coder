@@ -8,6 +8,20 @@ import (
 	types "github.com/IAmFutureHokage/HL-Coder/pkg/types"
 )
 
+func checkCodeBlock(s string) error {
+
+	matched, err := regexp.MatchString(`^[0-9/]{5}$`, s)
+	if err != nil {
+		return fmt.Errorf("error while matching regex: %v", err)
+	}
+
+	if !matched {
+		return fmt.Errorf("the string must be exactly 5 characters long and consist of a digit followed by either four digits or four slashes")
+	}
+
+	return nil
+}
+
 func PostCodeDecoder(s string) (*types.PostCode, error) {
 
 	err := checkCodeBlock(s)
@@ -150,6 +164,7 @@ func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
 }
 
 func TemperatureDecoder(s string) (*types.Temperature, error) {
+
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
@@ -189,6 +204,7 @@ func TemperatureDecoder(s string) (*types.Temperature, error) {
 }
 
 func PhenomeniaDecoder(s string) ([]*types.Phenomenia, error) {
+
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
@@ -256,6 +272,7 @@ func IcePhenomeniaStateDecoder(s string) (*types.IcePhenomeniaState, error) {
 }
 
 func IceInfoDecoder(s string) (*types.IceInfo, error) {
+
 	err := checkCodeBlock(s)
 	if err != nil {
 		return nil, err
@@ -586,18 +603,4 @@ func ResetDecoder(s string) (*types.Reset, error) {
 
 	response := types.Reset(floatReset)
 	return &response, nil
-}
-
-func checkCodeBlock(s string) error {
-
-	matched, err := regexp.MatchString(`^[0-9/]{5}$`, s)
-	if err != nil {
-		return fmt.Errorf("error while matching regex: %v", err)
-	}
-
-	if !matched {
-		return fmt.Errorf("the string must be exactly 5 characters long and consist of a digit followed by either four digits or four slashes")
-	}
-
-	return nil
 }
