@@ -13,7 +13,7 @@ type WaterLevelOnTime int16
 
 type DeltaWaterLevel int16
 
-type WaterLevelOn20h uint16
+type WaterLevelOn20h int16
 
 type Temperature struct {
 	WaterTemperature *float32

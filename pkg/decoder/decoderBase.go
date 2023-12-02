@@ -92,7 +92,7 @@ func WaterLevelOnTimeDecoder(s string) (*types.WaterLevelOnTime, error) {
 	}
 
 	if waterlevel > 5000 && waterlevel < 6000 {
-		waterlevel = 0 - waterlevel - 5000
+		waterlevel = 0 - waterlevel + 5000
 	}
 
 	response := types.WaterLevelOnTime(waterlevel)
@@ -156,7 +156,7 @@ func WaterLevelOn20hDecoder(s string) (*types.WaterLevelOn20h, error) {
 	}
 
 	if waterlevel > 5000 && waterlevel < 6000 {
-		waterlevel = 0 - waterlevel - 5000
+		waterlevel = 0 - waterlevel + 5000
 	}
 
 	response := types.WaterLevelOn20h(waterlevel)
