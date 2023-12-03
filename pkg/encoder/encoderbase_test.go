@@ -640,3 +640,85 @@ func TestHeadwaterLevelEncoder(t *testing.T) {
 		})
 	}
 }
+
+func TestAverageReservoirLevelEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.AverageReservoirLevel
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid AverageReservoirLevel",
+			input:   func() *types.AverageReservoirLevel { a := types.AverageReservoirLevel(1234); return &a }(),
+			want:    "21234",
+			wantErr: false,
+		},
+		{
+			name:    "Special case AverageReservoirLevel - maximum value",
+			input:   func() *types.AverageReservoirLevel { a := types.AverageReservoirLevel(4294967295); return &a }(),
+			want:    "2////",
+			wantErr: false,
+		},
+		{
+			name:    "Nil AverageReservoirLevel",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := AverageReservoirLevelEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("AverageReservoirLevelEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("AverageReservoirLevelEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDownstreamLevelEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.DownstreamLevel
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid DownstreamLevel",
+			input:   func() *types.DownstreamLevel { d := types.DownstreamLevel(1234); return &d }(),
+			want:    "41234",
+			wantErr: false,
+		},
+		{
+			name:    "Special case DownstreamLevel - maximum value",
+			input:   func() *types.DownstreamLevel { d := types.DownstreamLevel(4294967295); return &d }(),
+			want:    "4////",
+			wantErr: false,
+		},
+		{
+			name:    "Nil DownstreamLevel",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := DownstreamLevelEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DownstreamLevelEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("DownstreamLevelEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
