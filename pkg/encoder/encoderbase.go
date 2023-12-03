@@ -356,7 +356,7 @@ func InflowEncoder(inflow *types.Inflow) (string, error) {
 	flow := float64(*inflow)
 	var factor int
 
-	if flow == 4294967295 {
+	if flow > 100000 {
 		return "4////", nil
 	}
 
@@ -383,7 +383,7 @@ func ResetEncoder(reset *types.Reset) (string, error) {
 	value := float64(*reset)
 	var factor int
 
-	if value == 4294967295 {
+	if value > 100000 {
 		return "7////", nil
 	}
 

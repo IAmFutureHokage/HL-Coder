@@ -810,3 +810,97 @@ func TestIsReservoirWaterInflowEncoder(t *testing.T) {
 		})
 	}
 }
+
+func TestInflowEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.Inflow
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid Inflow",
+			input:   func() *types.Inflow { i := types.Inflow(23.5); return &i }(),
+			want:    "42235",
+			wantErr: false,
+		},
+		{
+			name:    "Special case Inflow - maximum value",
+			input:   func() *types.Inflow { i := types.Inflow(4294967295); return &i }(),
+			want:    "4////",
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Inflow - too small",
+			input:   func() *types.Inflow { i := types.Inflow(0.0001); return &i }(),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Nil Inflow",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := InflowEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("InflowEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("InflowEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestResetEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.Reset
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid Reset",
+			input:   func() *types.Reset { r := types.Reset(234.0); return &r }(),
+			want:    "73234",
+			wantErr: false,
+		},
+		{
+			name:    "Special case Reset - maximum value",
+			input:   func() *types.Reset { r := types.Reset(4294967295); return &r }(),
+			want:    "7////",
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Reset - too small",
+			input:   func() *types.Reset { r := types.Reset(0.0001); return &r }(),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Nil Reset",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ResetEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ResetEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ResetEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
