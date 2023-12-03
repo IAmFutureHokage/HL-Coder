@@ -558,3 +558,85 @@ func TestPrecipitationEncoder(t *testing.T) {
 		})
 	}
 }
+
+func TestIsReservoirEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.IsReservoir
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid IsReservoir",
+			input:   &types.IsReservoir{Date: 15},
+			want:    "94415",
+			wantErr: false,
+		},
+		{
+			name:    "Invalid IsReservoir - invalid day",
+			input:   &types.IsReservoir{Date: 32},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Nil IsReservoir",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IsReservoirEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsReservoirEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IsReservoirEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestHeadwaterLevelEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.HeadwaterLevel
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid HeadwaterLevel",
+			input:   func() *types.HeadwaterLevel { h := types.HeadwaterLevel(1234); return &h }(),
+			want:    "11234",
+			wantErr: false,
+		},
+		{
+			name:    "Special case HeadwaterLevel - maximum value",
+			input:   func() *types.HeadwaterLevel { h := types.HeadwaterLevel(4294967295); return &h }(),
+			want:    "1////",
+			wantErr: false,
+		},
+		{
+			name:    "Nil HeadwaterLevel",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := HeadwaterLevelEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("HeadwaterLevelEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("HeadwaterLevelEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
