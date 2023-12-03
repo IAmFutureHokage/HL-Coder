@@ -722,3 +722,91 @@ func TestDownstreamLevelEncoder(t *testing.T) {
 		})
 	}
 }
+
+func TestReservoirVolumeEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.ReservoirVolume
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid ReservoirVolume",
+			input:   func() *types.ReservoirVolume { rv := types.ReservoirVolume(1230); return &rv }(),
+			want:    "74123",
+			wantErr: false,
+		},
+		{
+			name:    "Special case ReservoirVolume - maximum value",
+			input:   func() *types.ReservoirVolume { rv := types.ReservoirVolume(100001.0); return &rv }(),
+			want:    "7////",
+			wantErr: false,
+		},
+		{
+			name:    "Invalid ReservoirVolume - too small",
+			input:   func() *types.ReservoirVolume { rv := types.ReservoirVolume(0.0001); return &rv }(),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Nil ReservoirVolume",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ReservoirVolumeEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReservoirVolumeEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ReservoirVolumeEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsReservoirWaterInflowEncoder(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   *types.IsReservoirWaterInflow
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "Valid IsReservoirWaterInflow",
+			input:   &types.IsReservoirWaterInflow{Date: 15},
+			want:    "95515",
+			wantErr: false,
+		},
+		{
+			name:    "Invalid IsReservoirWaterInflow - invalid day",
+			input:   &types.IsReservoirWaterInflow{Date: 32},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Nil IsReservoirWaterInflow",
+			input:   nil,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IsReservoirWaterInflowEncoder(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsReservoirWaterInflowEncoder() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IsReservoirWaterInflowEncoder() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
